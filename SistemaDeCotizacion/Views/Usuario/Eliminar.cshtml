@@ -1,0 +1,44 @@
+﻿@model SistemaDeCotizacion.Models.Usuario
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Confirmar Eliminación</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <p class="fs-5">
+                        ¿Estás seguro que deseas eliminar al usuario
+                        <strong class="text-dark">@Model.nombre @Model.apellido</strong>?
+                    </p>
+
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4">Correo:</dt>
+                        <dd class="col-sm-8">@Model.correo</dd>
+
+                        <dt class="col-sm-4">DNI:</dt>
+                        <dd class="col-sm-8">@Model.dni</dd>
+
+                        <dt class="col-sm-4">Rol:</dt>
+                        <dd class="col-sm-8">@Model.rol?.rol_nombre</dd>
+                    </dl>
+
+                    <form asp-controller="Usuario" asp-action="ConfirmacionEliminar" method="post">
+                        <input type="hidden" name="id" value="@Model.usuario_id" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-controller="Usuario" asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

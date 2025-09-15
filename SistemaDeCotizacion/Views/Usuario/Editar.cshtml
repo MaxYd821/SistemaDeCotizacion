@@ -1,0 +1,103 @@
+﻿@model SistemaDeCotizacion.ViewModels.EditarUsuarioVM
+@{
+    ViewData["Title"] = "Editar Usuario";
+    Layout = "_Layout";
+    var roles = ViewBag.Roles as List<SistemaDeCotizacion.Models.Rol>;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Editar Usuario</h4>
+                </div>
+                <div class="card-body bg-light">
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
+
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <form asp-action="Editar" asp-controller="Usuario" method="post">
+                        <input asp-for="usuario_id" type="hidden" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="nombre" class="form-label">Nombre</label>
+                                <input asp-for="nombre" class="form-control" required />
+                                <span asp-validation-for="nombre" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="apellido" class="form-label">Apellido</label>
+                                <input asp-for="apellido" class="form-control" required />
+                                <span asp-validation-for="apellido" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="num_cel" class="form-label">Celular</label>
+                                <input asp-for="num_cel" class="form-control" required />
+                                <span asp-validation-for="num_cel" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="dni" class="form-label">DNI</label>
+                                <input asp-for="dni" class="form-control" maxlength="8" required />
+                                <span asp-validation-for="dni" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <input asp-for="fecha_nacimiento" type="date" class="form-control" required />
+                                <span asp-validation-for="fecha_nacimiento" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="estado" class="form-label">Estado</label>
+                                <input asp-for="estado" class="form-control" required />
+                                <span asp-validation-for="estado" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="correo" class="form-label">Correo</label>
+                                <input asp-for="correo" class="form-control" type="email" required />
+                                <span asp-validation-for="correo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="password" class="form-label">Contraseña</label>
+                                <input asp-for="password" class="form-control" type="password" required />
+                                <span asp-validation-for="password" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="rol_id" class="form-label">Rol</label>
+                                <select asp-for="rol_id" class="form-select" required>
+                                    <option value="">Selecciona un rol</option>
+                                    @foreach (var rol in roles)
+                                    {
+                                        <option value="@rol.rol_id">@rol.rol_nombre</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="rol_id" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Mostrar" class="btn btn-outline-dark">Volver</a>
+                            <button type="submit" class="btn btn-dark">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

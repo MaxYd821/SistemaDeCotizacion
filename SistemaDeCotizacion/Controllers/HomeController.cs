@@ -28,5 +28,10 @@ namespace SistemaDeCotizacion.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Salir()
+        {
+            return RedirectToAction("Login", "Cuenta");
+        }
     }
 }
