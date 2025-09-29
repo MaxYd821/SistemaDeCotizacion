@@ -15,7 +15,7 @@ namespace SistemaDeCotizacion.Models
         public string telefono_cliente { get; set; }
         public string direccion_cliente { get; set; }
         public string tipo { get; set; }
-        public ICollection<Vehiculo> vehiculos { get; set; }
-        public ICollection<Cotizacion> cotizacion { get; set; }
+        public ICollection<Vehiculo> vehiculos { get; set; } = new List<Vehiculo>();
+        public ICollection<Cotizacion> cotizacion { get; set; } = new List<Cotizacion>();
     }
 }

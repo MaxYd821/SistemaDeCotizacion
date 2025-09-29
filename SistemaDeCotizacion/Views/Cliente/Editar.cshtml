@@ -1,0 +1,81 @@
+﻿@model SistemaDeCotizacion.Models.Cliente
+@{
+    ViewData["Title"] = "Editar Cliente";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Editar Cliente</h4>
+                </div>
+                <div class="card-body bg-light">
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
+
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <form asp-action="Editar" asp-controller="Cliente" method="post">
+                        <input asp-for="cliente_id" type="hidden" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="nombre_cliente" class="form-label">Nombre</label>
+                                <input asp-for="nombre_cliente" class="form-control" placeholder="Nombre" required />
+                                <span asp-validation-for="nombre_cliente" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ruc" class="form-label">RUC/DNI</label>
+                                <input asp-for="ruc" class="form-control" placeholder="RUC/DNI" required />
+                                <span asp-validation-for="ruc" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="correo_cliente" class="form-label">Correo</label>
+                                <input asp-for="correo_cliente" class="form-control" type="email" placeholder="Correo electrónico" required />
+                                <span asp-validation-for="correo_cliente" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="direccion_cliente" class="form-label">Dirección</label>
+                                <input asp-for="direccion_cliente" class="form-control" placeholder="Jr./Av..." required />
+                                <span asp-validation-for="direccion_cliente" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="telefono_cliente" class="form-label">Teléfono</label>
+                                <input asp-for="telefono_cliente" class="form-control" placeholder="Número de contacto" required />
+                                <span asp-validation-for="telefono_cliente" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="tipo" class="form-label fw-semibold">Tipo</label>
+                                <select asp-for="tipo" class="form-select">
+                                    <option value="Persona Natural">Persona Natural</option>
+                                    <option value="Persona Jurídica">Persona Jurídica</option>
+                                </select>
+                                <span asp-validation-for="tipo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Mostrar" class="btn btn-outline-dark">Volver</a>
+                            <button type="submit" class="btn btn-dark">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
