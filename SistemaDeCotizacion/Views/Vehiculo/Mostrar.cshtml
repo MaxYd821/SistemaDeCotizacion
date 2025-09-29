@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SistemaDeCotizacion.Models.Vehiculo>
+
+@{
+    ViewData["Title"] = "Vehículos";
+}
+
+<h2>Vehículos</h2>
+<a asp-action="Nuevo" class="btn btn-primary">Nuevo Vehículo</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Kilometraje</th>
+            <th>Cliente</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var v in Model)
+        {
+            <tr>
+                <td>@v.placa</td>
+                <td>@v.marca</td>
+                <td>@v.modelo</td>
+                <td>@v.kilometraje</td>
+                <td>@v.cliente?.nombre_cliente</td>
+                <td>
+                    <a asp-action="Editar" asp-route-id="@v.vehiculo_id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Eliminar" asp-route-id="@v.vehiculo_id" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

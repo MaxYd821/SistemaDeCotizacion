@@ -1,0 +1,15 @@
+﻿@model SistemaDeCotizacion.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Eliminar Vehículo";
+}
+
+<h2>Eliminar Vehículo</h2>
+<div class="alert alert-warning">
+    ¿Está seguro que desea eliminar el vehículo con placa <strong>@Model.placa</strong>?
+</div>
+<form asp-action="ConfirmarEliminar" method="post">
+    <input type="hidden" asp-for="vehiculo_id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Mostrar" class="btn btn-secondary">Cancelar</a>
+</form>
