@@ -81,6 +81,66 @@ public class ClienteTest
     }
 
     [TestMethod]
+    public async Task NuevoCliente_RucDuplicado()
+    {
+        var cliente = new Cliente
+        {
+            nombre_cliente = "Luis Gómez",
+            correo_cliente = "luis@correo.com",
+            ruc = "12345678",
+            telefono_cliente = "666666666",
+            direccion_cliente = "Av. Central 789",
+            tipo = "Persona Natural"
+        };
+
+        var result = await _controller.Nuevo(cliente);
+
+        Assert.IsInstanceOfType(result, typeof(ViewResult));
+        var view = result as ViewResult;
+        Assert.AreEqual("RUC/DNI ya registrado.", view.ViewData["mensaje"]);
+    }
+
+    [TestMethod]
+    public async Task NuevoCliente_RucLongitudIncorrecta_PersonaNatural()
+    {
+        var cliente = new Cliente
+        {
+            nombre_cliente = "Carlos Ruiz",
+            correo_cliente = "carlos@correo.com",
+            ruc = "1234567",
+            telefono_cliente = "555555555",
+            direccion_cliente = "Av. Sur 123",
+            tipo = "Persona Natural"
+        };
+
+        var result = await _controller.Nuevo(cliente);
+
+        Assert.IsInstanceOfType(result, typeof(ViewResult));
+        var view = result as ViewResult;
+        Assert.AreEqual("La longitud del DNI debe ser de 8 dígitos.", view.ViewData["mensaje"]);
+    }
+
+    [TestMethod]
+    public async Task NuevoCliente_RucLongitudIncorrecta_PersonaJuridica()
+    {
+        var cliente = new Cliente
+        {
+            nombre_cliente = "Empresa SAC",
+            correo_cliente = "empresa@sac.com",
+            ruc = "1234567890",
+            telefono_cliente = "444444444",
+            direccion_cliente = "Calle Norte 456",
+            tipo = "Persona Jurídica"
+        };
+
+        var result = await _controller.Nuevo(cliente);
+
+        Assert.IsInstanceOfType(result, typeof(ViewResult));
+        var view = result as ViewResult;
+        Assert.AreEqual("La longitud del RUC debe ser de 11 dígitos.", view.ViewData["mensaje"]);
+    }
+
+    [TestMethod]
     public async Task EditarCliente_ActualizaDatos()
     {
         var cliente = new Cliente
