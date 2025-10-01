@@ -37,7 +37,7 @@
             @foreach (var c in clientes)
             {
                 var selected = c.cliente_id == Model.cliente_id ? "selected" : "";
-                <option value="@c.cliente_id" @selected>
+                <option value="@c.cliente_id" selected>
                     @c.nombre_cliente (@c.ruc)
                 </option>
             }
