@@ -55,6 +55,12 @@ namespace SistemaDeCotizacion.Controllers
                 ViewData["mensaje"] = "Debes tener al menos 18 años.";
                 return View(model);
             }
+            if (model.password!=model.confirmarpassword)
+            {
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewData["mensaje"] = "Las contraseñas no coinciden";
+                return View(model);
+            }
 
             var usuario = new Usuario
             {
