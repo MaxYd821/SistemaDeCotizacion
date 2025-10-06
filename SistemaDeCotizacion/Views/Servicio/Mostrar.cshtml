@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SistemaDeCotizacion.Models.Servicio>
+
+@{
+    ViewData["Title"] = "Servicios";
+}
+
+<h2>Lista de Servicios</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Nuevo">Registrar nuevo servicio</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio (S/.)</th>
+            <th>Fecha Registro</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.nombre_servicio</td>
+                <td>@s.precio</td>
+                <td>@s.fecha_registro_servicio.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" asp-action="Editar" asp-route-id="@s.servicio_id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-action="Eliminar" asp-route-id="@s.servicio_id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

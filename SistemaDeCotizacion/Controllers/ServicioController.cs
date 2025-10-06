@@ -17,7 +17,8 @@ namespace SistemaDeCotizacion.Controllers
         [HttpGet]
         public async Task<IActionResult> Mostrar()
         {
-            return View();
+            var servicios = _appDBContext.Servicios.ToList();
+            return View(servicios);
         }
 
         [HttpGet]
