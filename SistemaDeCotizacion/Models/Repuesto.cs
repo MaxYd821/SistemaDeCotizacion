@@ -6,6 +6,8 @@ namespace SistemaDeCotizacion.Models
     {
         public int repuesto_id { get; set; }
         public string codigo_rep { get; set; }
+        public string descripcion { get; set; }
+        public int stock { get; set; }
         public string medida_rep { get; set; }
         public Double precio_und { get; set; }
 

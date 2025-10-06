@@ -2,47 +2,43 @@
 
 @{
     ViewData["Title"] = "Editar Vehículo";
-    var clientes = ViewData["Clientes"] as List<SistemaDeCotizacion.Models.Cliente>;
 }
 
 <h2>Editar Vehículo</h2>
 
-@if (ViewData["mensaje"] != null)
-{
-    <div class="alert alert-danger">@ViewData["mensaje"]</div>
-}
-
 <form asp-action="Editar" method="post">
     <input type="hidden" asp-for="vehiculo_id" />
-    <div class="form-group">
-        <label>Placa</label>
-        <input asp-for="placa" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Marca</label>
-        <input asp-for="marca" class="form-control" />
-    </div>
+
     <div class="form-group">
         <label>Modelo</label>
         <input asp-for="modelo" class="form-control" />
     </div>
+
+    <div class="form-group">
+        <label>Marca</label>
+        <input asp-for="marca" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Placa</label>
+        <input asp-for="placa" class="form-control" />
+    </div>
+
     <div class="form-group">
         <label>Kilometraje</label>
-        <input asp-for="kilometraje" class="form-control" type="number" />
+        <input asp-for="kilometraje" type="number" class="form-control" />
     </div>
+
     <div class="form-group">
         <label>Cliente</label>
-        <select asp-for="cliente_id" class="form-control">
-            <option value="">Seleccione un cliente</option>
-            @foreach (var c in clientes)
-            {
-                var selected = c.cliente_id == Model.cliente_id ? "selected" : "";
-                <option value="@c.cliente_id" @selected>
-                    @c.nombre_cliente (@c.ruc)
-                </option>
-            }
+        <select asp-for="cliente_id" class="form-control" asp-items="@(new SelectList(ViewBag.Clientes, "cliente_id", "nombre_cliente", Model.cliente_id))">
+            <option value="">-- Seleccione un cliente --</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
+
+    <br />
+    <span class="text-danger">@ViewData["mensaje"]</span>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
     <a asp-action="Mostrar" class="btn btn-secondary">Cancelar</a>
 </form>

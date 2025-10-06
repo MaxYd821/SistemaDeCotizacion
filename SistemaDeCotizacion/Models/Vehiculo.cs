@@ -13,7 +13,8 @@ namespace SistemaDeCotizacion.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime fecha_registro_vehiculo { get; set; }
         public int kilometraje { get; set; }
-        public int cliente_id { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar un cliente.")]
+        public int? cliente_id { get; set; }
         public Cliente cliente { get; set; }
     }
 }

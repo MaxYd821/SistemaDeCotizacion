@@ -4,14 +4,19 @@
     ViewData["Title"] = "Vehículos";
 }
 
-<h2>Vehículos</h2>
-<a asp-action="Nuevo" class="btn btn-primary">Nuevo Vehículo</a>
-<table class="table">
+<h2>Lista de Vehículos</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Nuevo">Registrar nuevo vehículo</a>
+</p>
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Placa</th>
-            <th>Marca</th>
             <th>Modelo</th>
+            <th>Marca</th>
+            <th>Placa</th>
+            <th>Fecha Registro</th>
             <th>Kilometraje</th>
             <th>Cliente</th>
             <th>Acciones</th>
@@ -21,14 +26,15 @@
         @foreach (var v in Model)
         {
             <tr>
-                <td>@v.placa</td>
-                <td>@v.marca</td>
                 <td>@v.modelo</td>
+                <td>@v.marca</td>
+                <td>@v.placa</td>
+                <td>@v.fecha_registro_vehiculo.ToString("yyyy-MM-dd")</td>
                 <td>@v.kilometraje</td>
                 <td>@v.cliente?.nombre_cliente</td>
                 <td>
-                    <a asp-action="Editar" asp-route-id="@v.vehiculo_id" class="btn btn-warning btn-sm">Editar</a>
-                    <a asp-action="Eliminar" asp-route-id="@v.vehiculo_id" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a class="btn btn-warning btn-sm" asp-action="Editar" asp-route-id="@v.vehiculo_id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-action="Eliminar" asp-route-id="@v.vehiculo_id">Eliminar</a>
                 </td>
             </tr>
         }
