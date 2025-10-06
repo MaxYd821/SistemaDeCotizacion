@@ -33,7 +33,7 @@
 
                             <div class="col-md-6">
                                 <label asp-for="ruc" class="form-label">RUC/DNI</label>
-                                <input asp-for="ruc" class="form-control" placeholder="RUC/DNI" required />
+                                <input asp-for="ruc" class="form-control" type="text" pattern="\d+" placeholder="RUC/DNI" required />
                                 <span asp-validation-for="ruc" class="text-danger"></span>
                             </div>
 
@@ -51,7 +51,7 @@
 
                             <div class="col-md-6">
                                 <label asp-for="telefono_cliente" class="form-label">Teléfono</label>
-                                <input asp-for="telefono_cliente" class="form-control" placeholder="Número de contacto" required />
+                                <input asp-for="telefono_cliente" class="form-control" type="number" placeholder="Número de contacto" required />
                                 <span asp-validation-for="telefono_cliente" class="text-danger"></span>
                             </div>
 

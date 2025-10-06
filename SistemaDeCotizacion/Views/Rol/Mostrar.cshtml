@@ -1,0 +1,53 @@
+﻿@model List<SistemaDeCotizacion.Models.Rol>
+
+@{
+    ViewData["Title"] = "Lista de Roles";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold text-dark">Gestión de Roles</h3>
+                <a asp-controller="Rol" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Rol</a>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-secondary text-center">
+                    No hay roles registrados actualmente.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive shadow-sm border rounded">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Id</th>
+                                <th>Nombre del Rol</th>
+                                <th>Descripción del rol</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.rol_id</td>
+                                    <td>@item.rol_nombre</td>
+                                    <td>@item.rol_descripcion</td>
+                                    <td class="text-center">
+                                        <a asp-controller="Rol" asp-action="Editar" asp-route-id="@item.rol_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
+                                        <a asp-controller="Rol" asp-action="Eliminar" asp-route-id="@item.rol_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

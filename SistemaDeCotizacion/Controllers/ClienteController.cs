@@ -15,10 +15,20 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            var Clientes = _appDBContext.Clientes.ToList();
-            return View(Clientes);
+            var query = _appDBContext.Clientes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(c =>
+                    c.nombre_cliente.Contains(busqueda) ||
+                    c.ruc.Contains(busqueda)
+                );
+            }
+
+            var clientes = await query.ToListAsync();
+            return View(clientes);
         }
 
         [HttpGet]
@@ -74,6 +84,8 @@ namespace SistemaDeCotizacion.Controllers
 
             await _appDBContext.Clientes.AddAsync(cl);
             await _appDBContext.SaveChangesAsync();
+
+            TempData["mensaje"] = "Cliente registrado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
         [HttpGet]
@@ -156,6 +168,8 @@ namespace SistemaDeCotizacion.Controllers
             cl.direccion_cliente = cliente.direccion_cliente;
 
             await _appDBContext.SaveChangesAsync();
+
+            TempData["mensaje"] = "Cliente actualizado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
         [HttpGet]
@@ -175,6 +189,7 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext.Clientes.Remove(cliente);
             _appDBContext.SaveChanges();
 
+            TempData["mensaje"] = "Cliente eliminado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
     }
