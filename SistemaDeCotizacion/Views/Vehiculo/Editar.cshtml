@@ -1,59 +1,68 @@
 ﻿@model SistemaDeCotizacion.Models.Vehiculo
+
 @{
-    ViewData["Title"] = "Editar Vehiculo";
+    ViewData["Title"] = "Editar Vehículo";
     Layout = "_Layout";
 }
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow border-0">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0">
                 <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">Editar Vehiculo</h4>
+                    <h4 class="mb-0">Editar Vehículo</h4>
                 </div>
                 <div class="card-body bg-light">
-                    @if (ViewData["mensaje"] != null)
-                    {
-                        <div class="alert alert-danger text-center">
-                            @ViewData["mensaje"]
-                        </div>
-                    }
+                    <form asp-action="Editar" method="post">
+                        <div class="row g-3">
+							<input asp-for="vehiculo_id" type="hidden" />
+                            <div class="col-md-6">
+                                <label asp-for="modelo" class="form-label fw-semibold">Modelo del Vehículo</label>
+                                <input asp-for="modelo" class="form-control" required />
+                                <span asp-validation-for="modelo" class="text-danger"></span>
+                            </div>
 
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                            <div class="col-md-6">
+                                <label asp-for="cliente_id" class="form-label fw-semibold">Cliente</label>
+                                <select asp-for="cliente_id" class="form-select" required>
+                                    <option value="">Selecciona un cliente</option>
+                                    @foreach (var cliente in ViewBag.Clientes as List<SistemaDeCotizacion.Models.Cliente>)
+                                    {
+                                        <option value="@cliente.cliente_id">@cliente.nombre_cliente</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="cliente_id" class="text-danger"></span>
+                            </div>
 
-<form asp-action="Editar" method="post">
-    <input type="hidden" asp-for="vehiculo_id" />
-    <div class="form-group">
-        <label>Placa</label>
-        <input asp-for="placa" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Marca</label>
-        <input asp-for="marca" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Modelo</label>
-        <input asp-for="modelo" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Kilometraje</label>
-        <input asp-for="kilometraje" class="form-control" type="number" />
-    </div>
-    <div class="form-group">
-        <label>Cliente</label>
-        <select asp-for="cliente_id" class="form-control">
-            <option value="">Seleccione un cliente</option>
-            @foreach (var c in clientes)
-            {
-                var selected = c.cliente_id == Model.cliente_id ? "selected" : "";
-                <option value="@c.cliente_id" selected>
-                    @c.nombre_cliente (@c.ruc)
-                </option>
-            }
-        </select>
+                            <div class="col-md-4">
+                                <label asp-for="marca" class="form-label fw-semibold">Marca del Vehículo</label>
+                                <input asp-for="marca" class="form-control" />
+                                <span asp-validation-for="marca" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="placa" class="form-label fw-semibold">Placa del Vehículo</label>
+                                <input asp-for="placa" class="form-control" />
+                                <span asp-validation-for="placa" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="kilometraje" class="form-label fw-semibold">Kilometraje del Vehículo</label>
+                                <input asp-for="kilometraje" class="form-control" />
+                                <span asp-validation-for="kilometraje" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                                <button type="submit" class="btn btn-dark px-4">Guardar</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <partial name="_ValidationScriptsPartial" />
 }

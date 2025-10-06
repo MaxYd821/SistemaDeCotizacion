@@ -32,6 +32,7 @@
                                 <th>Dirección</th>
                                 <th>Teléfono</th>
                                 <th>Tipo</th>
+                                <th>Fecha de Registro</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -46,6 +47,7 @@
                                     <td>@item.direccion_cliente</td>
                                     <td>@item.telefono_cliente</td>
                                     <td>@item.tipo</td>
+                                    <td>@item.fecha_registro_cliente.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
                                         <a asp-controller="Cliente" asp-action="Editar" asp-route-id="@item.cliente_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
                                         <a asp-controller="Cliente" asp-action="Eliminar" asp-route-id="@item.cliente_id" class="btn btn-sm btn-outline-danger">Eliminar</a>

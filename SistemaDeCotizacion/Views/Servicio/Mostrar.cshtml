@@ -10,7 +10,7 @@
         <div class="col-lg-10">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold text-dark">Gestión de Servicios</h3>
-                <a asp-controller="Cliente" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Servicio</a>
+                <a asp-controller="Servicio" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Servicio</a>
             </div>
 
             @if (!Model.Any())
@@ -27,7 +27,7 @@
                             <tr>
                                 <th>Nombre del Servicio</th>
                                 <th>Precio (S/.)</th>
-                                <th>Detalle del servicio</th>
+                                <th>Fecha de Registro</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -37,10 +37,10 @@
                                 <tr>
                                     <td>@item.nombre_servicio</td>
                                     <td>@item.precio</td>
-                                    <td>@item.detalle_servicio</td>
+                                    <td>@item.fecha_registro_servicio.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
-                                        <a asp-controller="Cliente" asp-action="Editar" asp-route-id="@item.servicio_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
-                                        <a asp-controller="Cliente" asp-action="Eliminar" asp-route-id="@item.servicio_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                        <a asp-controller="Servicio" asp-action="Editar" asp-route-id="@item.servicio_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
+                                        <a asp-controller="Servicio" asp-action="Eliminar" asp-route-id="@item.servicio_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
                                     </td>
                                 </tr>
                             }
