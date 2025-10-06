@@ -83,6 +83,7 @@ namespace SistemaDeCotizacion.Data
                 tb.Property(col => col.vehiculo_id).UseIdentityColumn().ValueGeneratedOnAdd();
                 tb.Property(col => col.modelo).HasMaxLength(50);
                 tb.Property(col => col.marca).HasMaxLength(50);
+                tb.Property(col => col.placa).HasMaxLength(7);
                 tb.HasIndex(col => col.placa).IsUnique();
                 tb.Property(col => col.kilometraje);
                 tb.HasOne(u => u.cliente)
@@ -106,6 +107,7 @@ namespace SistemaDeCotizacion.Data
                 tb.HasKey(col => col.repuesto_id);
                 tb.Property(col => col.repuesto_id).UseIdentityColumn().ValueGeneratedOnAdd();
                 tb.Property(col => col.codigo_rep).HasMaxLength(10);
+                tb.Property(col => col.descripcion).HasMaxLength(60);
                 tb.Property(col => col.medida_rep).HasMaxLength(20);
                 tb.Property(col => col.precio_und).HasPrecision(8, 2);
             });

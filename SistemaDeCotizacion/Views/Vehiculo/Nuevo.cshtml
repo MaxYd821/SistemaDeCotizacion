@@ -2,43 +2,67 @@
 
 @{
     ViewData["Title"] = "Nuevo Vehículo";
-    var clientes = ViewData["Clientes"] as List<SistemaDeCotizacion.Models.Cliente>;
+    Layout = "_Layout";
 }
 
-<h2>Nuevo Vehículo</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Registrar Vehículo</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <form asp-action="Nuevo" method="post">
+                        <div class="row g-3">
 
-@if (ViewData["mensaje"] != null)
-{
-    <div class="alert alert-danger">@ViewData["mensaje"]</div>
+                            <div class="col-md-6">
+                                <label asp-for="modelo" class="form-label fw-semibold">Modelo del Vehículo</label>
+                                <input asp-for="modelo" class="form-control" required />
+                                <span asp-validation-for="modelo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="cliente_id" class="form-label fw-semibold">Cliente</label>
+                                <select asp-for="cliente_id" class="form-select" required>
+                                    <option value="">Selecciona un cliente</option>
+                                    @foreach (var cliente in ViewBag.Clientes as List<SistemaDeCotizacion.Models.Cliente>)
+                                    {
+                                        <option value="@cliente.cliente_id">@cliente.nombre_cliente</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="cliente_id" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="marca" class="form-label fw-semibold">Marca del Vehículo</label>
+                                <input asp-for="marca" class="form-control" />
+                                <span asp-validation-for="marca" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="placa" class="form-label fw-semibold">Placa del Vehículo</label>
+                                <input asp-for="placa" class="form-control" />
+                                <span asp-validation-for="placa" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="kilometraje" class="form-label fw-semibold">Kilometraje del Vehículo</label>
+                                <input asp-for="kilometraje" class="form-control" />
+                                <span asp-validation-for="kilometraje" class="text-danger"></span>
+                            </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                            <button type="submit" class="btn btn-dark px-4">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
-
-<form asp-action="Nuevo" method="post">
-    <div class="form-group">
-        <label>Placa</label>
-        <input asp-for="placa" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Marca</label>
-        <input asp-for="marca" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Modelo</label>
-        <input asp-for="modelo" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Kilometraje</label>
-        <input asp-for="kilometraje" class="form-control" type="number" />
-    </div>
-    <div class="form-group">
-        <label>Cliente</label>
-        <select asp-for="cliente_id" class="form-control">
-            <option value="">Seleccione un cliente</option>
-            @foreach (var c in clientes)
-            {
-                <option value="@c.cliente_id">@c.nombre_cliente (@c.ruc)</option>
-            }
-        </select>
-    </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Mostrar" class="btn btn-secondary">Cancelar</a>
-</form>

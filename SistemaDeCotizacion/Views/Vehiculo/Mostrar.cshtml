@@ -4,14 +4,19 @@
     ViewData["Title"] = "Vehículos";
 }
 
-<h2>Vehículos</h2>
-<a asp-action="Nuevo" class="btn btn-primary">Nuevo Vehículo</a>
-<table class="table">
+<h2>Lista de Vehículos</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Nuevo">Registrar nuevo vehículo</a>
+</p>
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Placa</th>
-            <th>Marca</th>
             <th>Modelo</th>
+            <th>Marca</th>
+            <th>Placa</th>
+            <th>Fecha Registro</th>
             <th>Kilometraje</th>
             <th>Cliente</th>
             <th>Acciones</th>
@@ -21,16 +26,74 @@
         @foreach (var v in Model)
         {
             <tr>
-                <td>@v.placa</td>
-                <td>@v.marca</td>
                 <td>@v.modelo</td>
+                <td>@v.marca</td>
+                <td>@v.placa</td>
+                <td>@v.fecha_registro_vehiculo.ToString("yyyy-MM-dd")</td>
                 <td>@v.kilometraje</td>
                 <td>@v.cliente?.nombre_cliente</td>
                 <td>
-                    <a asp-action="Editar" asp-route-id="@v.vehiculo_id" class="btn btn-warning btn-sm">Editar</a>
-                    <a asp-action="Eliminar" asp-route-id="@v.vehiculo_id" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a class="btn btn-warning btn-sm" asp-action="Editar" asp-route-id="@v.vehiculo_id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-action="Eliminar" asp-route-id="@v.vehiculo_id">Eliminar</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@model List<SistemaDeCotizacion.Models.Servicio>
+
+@{
+    ViewData["Title"] = "Lista de Servicios";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold text-dark">Gestión de Servicios</h3>
+                <a asp-controller="Cliente" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Servicio</a>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-secondary text-center">
+                    No hay servicios registrados actualmente.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive shadow-sm border rounded">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Modelo</th>
+                                <th>Marca</th>
+                                <th>Placa</th>
+                                <th>Fecha Registro</th>
+                                <th>Kilometraje</th>
+                                <th>Cliente</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.modelo</td>
+                                    <td>@item.marca</td>
+                                    <td>@item.placa</td>
+                                    <td class="text-center">
+                                        <a asp-controller="Cliente" asp-action="Editar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
+                                        <a asp-controller="Cliente" asp-action="Eliminar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

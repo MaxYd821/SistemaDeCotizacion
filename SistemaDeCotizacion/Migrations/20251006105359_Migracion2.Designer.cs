@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaDeCotizacion.Data;
 
@@ -11,9 +12,11 @@ using SistemaDeCotizacion.Data;
 namespace SistemaDeCotizacion.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251006105359_Migracion2")]
+    partial class Migracion2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,9 +241,6 @@ namespace SistemaDeCotizacion.Migrations
                     b.Property<double>("precio_und")
                         .HasPrecision(8, 2)
                         .HasColumnType("float(8)");
-
-                    b.Property<int>("stock")
-                        .HasColumnType("int");
 
                     b.HasKey("repuesto_id");
 

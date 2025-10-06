@@ -1,16 +1,25 @@
 ﻿@model SistemaDeCotizacion.Models.Vehiculo
-
 @{
-    ViewData["Title"] = "Editar Vehículo";
-    var clientes = ViewData["Clientes"] as List<SistemaDeCotizacion.Models.Cliente>;
+    ViewData["Title"] = "Editar Vehiculo";
+    Layout = "_Layout";
 }
 
-<h2>Editar Vehículo</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Editar Vehiculo</h4>
+                </div>
+                <div class="card-body bg-light">
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
 
-@if (ViewData["mensaje"] != null)
-{
-    <div class="alert alert-danger">@ViewData["mensaje"]</div>
-}
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
 <form asp-action="Editar" method="post">
     <input type="hidden" asp-for="vehiculo_id" />
@@ -43,6 +52,8 @@
             }
         </select>
     </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Mostrar" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

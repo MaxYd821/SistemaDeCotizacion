@@ -2,14 +2,41 @@
 
 @{
     ViewData["Title"] = "Eliminar Vehículo";
+    Layout = "_Layout";
 }
 
-<h2>Eliminar Vehículo</h2>
-<div class="alert alert-warning">
-    ¿Está seguro que desea eliminar el vehículo con placa <strong>@Model.placa</strong>?
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Confirmar Eliminación</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <p class="fs-5">
+                        ¿Estás seguro que deseas eliminar el Vehículo con la placa
+                        <strong class="text-dark">@Model.placa</strong>?
+                    </p>
+
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4">Modelo:</dt>
+                        <dd class="col-sm-8">@Model.modelo</dd>
+                        <dt class="col-sm-4">Cliente:</dt>
+                        <dd class="col-sm-8">@Model.cliente?.nombre_cliente</dd>
+                        <dt class="col-sm-4">Marca:</dt>
+                        <dd class="col-sm-8">@Model.marca</dd>
+                    </dl>
+
+                    <form asp-controller="Vehiculo" asp-action="ConfirmacionEliminar" method="post">
+                        <input type="hidden" name="id" value="@Model.vehiculo_id" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-controller="Vehiculo" asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<form asp-action="ConfirmarEliminar" method="post">
-    <input type="hidden" asp-for="vehiculo_id" />
-    <button type="submit" class="btn btn-danger">Eliminar</button>
-    <a asp-action="Mostrar" class="btn btn-secondary">Cancelar</a>
-</form>
