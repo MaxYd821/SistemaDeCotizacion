@@ -33,7 +33,9 @@
 
                             <div class="col-md-6">
                                 <label asp-for="ruc" class="form-label">RUC/DNI</label>
-                                <input asp-for="ruc" class="form-control" type="text" pattern="\d+" placeholder="RUC/DNI" required />
+                                <input asp-for="ruc" class="form-control" placeholder="RUC/DNI" required pattern="^\d{8}$|^\d{11}$"
+                                       minlength="8"  maxlength="11" title="dni: 8 dígitos - ruc: 11 dígitos"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="ruc" class="text-danger"></span>
                             </div>
 
@@ -51,7 +53,10 @@
 
                             <div class="col-md-6">
                                 <label asp-for="telefono_cliente" class="form-label">Teléfono</label>
-                                <input asp-for="telefono_cliente" class="form-control" type="number" placeholder="Número de contacto" required />
+                                <input asp-for="telefono_cliente" class="form-control" placeholder="Número de contacto" required pattern="^9\d{8}$" maxlength="9" minlength="9"
+                                       title="El número debe empezar con 9 y tener 9 dígitos"
+                                       placeholder="Número de Celular" required
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="telefono_cliente" class="text-danger"></span>
                             </div>
 
@@ -75,7 +80,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-}

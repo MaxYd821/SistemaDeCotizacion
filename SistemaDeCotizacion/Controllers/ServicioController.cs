@@ -42,6 +42,7 @@ namespace SistemaDeCotizacion.Controllers
 
             await _appDBContext.Servicios.AddAsync(servicio);
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Servicio creado exitosamente.";
 
             return RedirectToAction(nameof(Mostrar));
         }
@@ -78,6 +79,7 @@ namespace SistemaDeCotizacion.Controllers
             ser.detalle_servicio = servicio.detalle_servicio;
 
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Servicio actualizado exitosamente.";
             return RedirectToAction(nameof(Mostrar));
         }
 

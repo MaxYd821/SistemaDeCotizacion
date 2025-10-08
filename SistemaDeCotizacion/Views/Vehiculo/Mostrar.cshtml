@@ -5,6 +5,13 @@
     Layout = "_Layout";
 }
 
+@if (TempData["mensaje"] != null)
+{
+    <div id="alert-success" class="alert alert-success text-center">
+        @TempData["mensaje"]
+    </div>
+}
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -57,3 +64,17 @@
         </div>
     </div>
 </div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var alert = document.getElementById('alert-success');
+            if (alert) {
+                setTimeout(function () {
+                    alert.style.display = 'none';
+                }, 3000); // 3000 ms = 3 segundos
+            }
+        });
+    </script>
+}

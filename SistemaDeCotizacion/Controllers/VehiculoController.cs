@@ -47,6 +47,8 @@ namespace SistemaDeCotizacion.Controllers
 
             await _appDBContext.Vehiculos.AddAsync(vehiculo);
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Vehículo creado exitosamente.";
+
 
             return RedirectToAction(nameof(Mostrar));
         }
@@ -86,6 +88,8 @@ namespace SistemaDeCotizacion.Controllers
             veh.cliente_id = vehiculo.cliente_id;
 
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Vehículo editado exitosamente.";
+
             return RedirectToAction(nameof(Mostrar));
         }
 

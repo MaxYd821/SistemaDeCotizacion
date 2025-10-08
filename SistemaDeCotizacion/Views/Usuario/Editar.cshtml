@@ -40,13 +40,21 @@
 
                             <div class="col-md-6">
                                 <label asp-for="num_cel" class="form-label">Celular</label>
-                                <input asp-for="num_cel" class="form-control" required />
+                                <input asp-for="num_cel" class="form-control" type="tel"
+                                       pattern="^9\d{8}$" maxlength="9" minlength="9"
+                                       title="El número debe empezar con 9 y tener 9 dígitos"
+                                       placeholder="Número de Celular" required
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="num_cel" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6">
                                 <label asp-for="dni" class="form-label">DNI</label>
-                                <input asp-for="dni" class="form-control" maxlength="8" required />
+                                <input asp-for="dni" class="form-control" type="text"
+                                       pattern="^\d{8}$" maxlength="8" minlength="8"
+                                       title="El dni debe tener 8 dígitos"
+                                       placeholder="DNI" required
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0.8);" />
                                 <span asp-validation-for="dni" class="text-danger"></span>
                             </div>
 

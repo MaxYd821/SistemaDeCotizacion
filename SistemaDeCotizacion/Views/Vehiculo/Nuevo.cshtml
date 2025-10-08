@@ -44,7 +44,7 @@
 
                             <div class="col-md-4">
                                 <label asp-for="marca" class="form-label fw-semibold">Marca del Vehículo</label>
-                                <input asp-for="marca" class="form-control" required/>
+                                <input asp-for="marca" class="form-control" required />
                                 <span asp-validation-for="marca" class="text-danger"></span>
                             </div>
 
@@ -56,7 +56,8 @@
 
                             <div class="col-md-4">
                                 <label asp-for="kilometraje" class="form-label fw-semibold">Kilometraje del Vehículo</label>
-                                <input asp-for="kilometraje" class="form-control" required/>
+                                <input asp-for="kilometraje" class="form-control" min="0" max="1000000" required
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="kilometraje" class="text-danger"></span>
                             </div>
 
