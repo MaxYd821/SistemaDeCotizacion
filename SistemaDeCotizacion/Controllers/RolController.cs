@@ -41,6 +41,7 @@ namespace SistemaDeCotizacion.Controllers
             await _appDBContext.Roles.AddAsync(rol);
             await _appDBContext.SaveChangesAsync();
 
+            TempData["mensaje"] = "Rol registrado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
 
@@ -75,6 +76,8 @@ namespace SistemaDeCotizacion.Controllers
             ro.rol_descripcion = rol.rol_descripcion;
 
             await _appDBContext.SaveChangesAsync();
+
+            TempData["mensaje"] = "Rol actualizado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
 
@@ -102,6 +105,7 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext.Roles.Remove(rol);
             _appDBContext.SaveChanges();
 
+            TempData["mensaje"] = "Rol eliminado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
     }

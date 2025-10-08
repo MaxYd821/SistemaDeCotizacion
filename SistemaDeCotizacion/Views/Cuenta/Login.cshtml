@@ -58,6 +58,12 @@
     <div class="login-container">
         <h2 class="login-title">Iniciar Sesión</h2>
 
+        @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
         <form asp-controller="Cuenta" asp-action="Login" method="post">
             <div class="mb-3">
                 <label asp-for="correo" class="form-label">Correo electrónico</label>
