@@ -78,6 +78,8 @@ namespace SistemaDeCotizacion.Controllers
 
             await _appDBContext.Usuarios.AddAsync(usuario);
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Usuario creado exitosamente.";
+
             return RedirectToAction(nameof(Mostrar));
         }
 
@@ -158,6 +160,7 @@ namespace SistemaDeCotizacion.Controllers
             usuario.rol_id = model.rol_id;
 
             await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Usuario editado exitosamente.";
             return RedirectToAction(nameof(Mostrar));
         }
 

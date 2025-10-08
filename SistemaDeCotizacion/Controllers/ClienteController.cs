@@ -86,6 +86,7 @@ namespace SistemaDeCotizacion.Controllers
             await _appDBContext.SaveChangesAsync();
 
             TempData["mensaje"] = "Cliente registrado con éxito.";
+
             return RedirectToAction(nameof(Mostrar));
         }
         [HttpGet]
@@ -170,6 +171,7 @@ namespace SistemaDeCotizacion.Controllers
             await _appDBContext.SaveChangesAsync();
 
             TempData["mensaje"] = "Cliente actualizado con éxito.";
+
             return RedirectToAction(nameof(Mostrar));
         }
         [HttpGet]

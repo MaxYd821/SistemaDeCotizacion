@@ -7,6 +7,7 @@ namespace SistemaDeCotizacion.Models
         public int cliente_id { get; set; }
         public string nombre_cliente { get; set; }
         public string correo_cliente { get; set; }
+        [RegularExpression(@"^\d{8}$|^\d{11}$", ErrorMessage = "El RUC debe tener 11 dígitos y el DNI 8 dígitos.")]
         public string ruc { get; set; }
 
         [DataType(DataType.Date)]

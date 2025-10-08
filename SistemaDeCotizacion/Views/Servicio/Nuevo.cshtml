@@ -24,7 +24,7 @@
 
                             <div class="col-md-4">
                                 <label asp-for="precio" class="form-label fw-semibold">Precio del Servicio (S/.)</label>
-                                <input asp-for="precio" class="form-control" />
+                                <input asp-for="precio" class="form-control" type="number" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="precio" class="text-danger"></span>
                             </div>
 
