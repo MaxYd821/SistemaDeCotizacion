@@ -15,9 +15,18 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            var roles = _appDBContext.Roles.ToList();
+            var query = _appDBContext.Roles.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(r =>
+                    r.rol_nombre.Contains(busqueda)
+                );
+            }
+
+            var roles = await query.ToListAsync();
             return View(roles);
         }
 

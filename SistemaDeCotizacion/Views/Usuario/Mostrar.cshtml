@@ -20,6 +20,13 @@
                 <a asp-controller="Usuario" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Usuario</a>
             </div>
 
+            <form asp-action="Mostrar" method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="busqueda" value="@(Context.Request.Query["busqueda"])" class="form-control" placeholder="Buscar por nombre, apellido, rol o DNI..." />
+                    <button type="submit" class="btn btn-dark">Buscar</button>
+                </div>
+            </form>
+
             @if (!Model.Any())
             {
                 <div class="alert alert-secondary text-center">
@@ -35,6 +42,9 @@
                                 <th>ID</th>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
+                                <th>Número de celular</th>
+                                <th>DNI</th>
+                                <th>Estado</th>
                                 <th>Correo</th>
                                 <th>Contraseña</th>
                                 <th>Rol</th>
@@ -50,6 +60,9 @@
                                     <td>@item.usuario_id</td>
                                     <td>@item.nombre</td>
                                     <td>@item.apellido</td>
+                                    <td>@item.num_cel</td>
+                                    <td>@item.dni</td>
+                                    <td>@item.estado</td>
                                     <td>@item.correo</td>
                                     <td>
                                         <span class="text-muted">********</span>

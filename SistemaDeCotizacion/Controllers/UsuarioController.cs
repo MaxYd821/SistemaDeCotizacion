@@ -15,11 +15,24 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            List<Usuario> usuarios = await _appDBContext.Usuarios
+            var query = _appDBContext.Usuarios
                 .Include(u => u.rol)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(u =>
+                    u.nombre.Contains(busqueda) ||
+                    u.apellido.Contains(busqueda) ||
+                    u.dni.Contains(busqueda) ||
+                    u.rol.rol_nombre.Contains(busqueda)
+                );
+            }
+
+            var usuarios = await query.ToListAsync();
+
             return View(usuarios);
         }
 

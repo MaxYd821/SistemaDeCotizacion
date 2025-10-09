@@ -15,9 +15,18 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            var servicios = _appDBContext.Servicios.ToList();
+            var query = _appDBContext.Servicios.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(s =>
+                    s.nombre_servicio.Contains(busqueda)
+                );
+            }
+
+            var servicios = await query.ToListAsync();
             return View(servicios);
         }
 

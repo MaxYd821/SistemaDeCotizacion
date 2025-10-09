@@ -15,9 +15,19 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            var repuestos = _appDBContext.Repuestos.ToList();
+            var query = _appDBContext.Repuestos.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(r =>
+                    r.codigo_rep.Contains(busqueda) ||
+                    r.descripcion.Contains(busqueda)
+                );
+            }
+
+            var repuestos = await query.ToListAsync();
             return View(repuestos);
         }
 
