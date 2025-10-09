@@ -107,6 +107,7 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext.Servicios.Remove(servicio);
             _appDBContext.SaveChanges();
 
+            TempData["mensaje"] = "Servicio eliminado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
     }

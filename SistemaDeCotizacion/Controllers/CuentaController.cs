@@ -55,7 +55,7 @@ namespace SistemaDeCotizacion.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             // Redirigir al inicio
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Mostrar", "Cliente");
         }
     }
 }

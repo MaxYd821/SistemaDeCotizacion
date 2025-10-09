@@ -21,7 +21,7 @@
 
         [data-bs-theme="dark"] {
             --main-bg: #121212;
-            --main-text: #ffffff;
+            --main-text: #3049d9;
             background-color: var(--main-bg) !important;
             color: var(--main-text) !important;
         }
@@ -56,20 +56,28 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light border-bottom shadow-sm px-4 py-2" id="mainNavbar">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold text-dark" asp-controller="Home" asp-action="Index">TodoCamiones</a>
+                <a class="navbar-brand fw-bold text-dark" asp-controller="Cliente" asp-action="Mostrar">TodoCamiones</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        @if (rolUsuario == "admin")
+                        @if (rolUsuario == "Administrador")
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Usuario" asp-action="Mostrar">Usuarios</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Rol" asp-action="Mostrar">Roles</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Cliente" asp-action="Mostrar">Clientes</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Vehiculo" asp-action="Mostrar">Vehículos</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Servicio" asp-action="Mostrar">Servicios</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Repuesto" asp-action="Mostrar">Repuestos</a></li>
+                        }
+                        @if (rolUsuario == "Encargado de Logistica")
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Cliente" asp-action="Mostrar">Clientes</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Vehiculo" asp-action="Mostrar">Vehículos</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Servicio" asp-action="Mostrar">Servicios</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Repuesto" asp-action="Mostrar">Repuestos</a></li>
                         }
                         @if (User.Identity.IsAuthenticated)
                         {

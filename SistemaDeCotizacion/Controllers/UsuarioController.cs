@@ -181,6 +181,7 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext.Usuarios.Remove(usuario);
             _appDBContext.SaveChanges();
 
+            TempData["mensaje"] = "Usuario eliminado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
     }

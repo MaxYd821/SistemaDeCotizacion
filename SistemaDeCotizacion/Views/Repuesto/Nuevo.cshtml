@@ -1,0 +1,70 @@
+﻿@model SistemaDeCotizacion.Models.Repuesto
+
+@{
+    ViewData["Title"] = "Nuevo Repuesto";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Registrar Repuesto</h4>
+                </div>
+                <div class="card-body bg-light">
+
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
+
+                    <form asp-action="Nuevo" method="post">
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label asp-for="codigo_rep" class="form-label fw-semibold">Código</label>
+                                <input asp-for="codigo_rep" class="form-control" placeholder="Código del vehículo" required />
+                                <span asp-validation-for="codigo_rep" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="descripcion" class="form-label fw-semibold">Descripción</label>
+                                <input asp-for="descripcion" class="form-control" placeholder="Descripción del vehículo" required />
+                                <span asp-validation-for="descripcion" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="stock" class="form-label fw-semibold">Stock</label>
+                                <input asp-for="stock" class="form-control" type="number" placeholder="Stock del repuesto" required />
+                                <span asp-validation-for="stock" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="medida_rep" class="form-label fw-semibold">Medida</label>
+                                <input asp-for="medida_rep" class="form-control" placeholder="Medida del repuesto" required />
+                                <span asp-validation-for="medida_rep" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="precio_und" class="form-label fw-semibold">Precio por unidad (S/.)</label>
+                                <input asp-for="precio_und" class="form-control" type="number" placeholder="Precio del repuesto" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                                <span asp-validation-for="precio_und" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                                <button type="submit" class="btn btn-dark px-4">Guardar</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

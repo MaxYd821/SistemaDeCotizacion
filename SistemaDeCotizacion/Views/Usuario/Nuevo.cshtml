@@ -25,39 +25,43 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label asp-for="nombre" class="form-label">Nombre</label>
-                                <input asp-for="nombre" class="form-control" placeholder="Nombre" required />
+                                <input asp-for="nombre" class="form-control" placeholder="Ejm: Carlos Francis" required />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="apellido" class="form-label">Apellido</label>
-                                <input asp-for="apellido" class="form-control" placeholder="Apellido" required />
+                                <input asp-for="apellido" class="form-control" placeholder="Ejm: Gonzales Guerra" required />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="num_cel" class="form-label">Celular</label>
                                 <input asp-for="num_cel" class="form-control" type="tel"
                                        pattern="^9\d{8}$" maxlength="9" minlength="9"
                                        title="El número debe empezar con 9 y tener 9 dígitos"
-                                       placeholder="Número de Celular" required
+                                       placeholder="Ejm: 950291837" required
                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="dni" class="form-label">DNI</label>
                                 <input asp-for="dni" class="form-control" type="text"
                                        pattern="^\d{8}$" maxlength="8" minlength="8"
-                                       title="El dni debe tener 8 dígitos"
-                                       placeholder="DNI" required
+                                       title="El DNI debe tener 8 dígitos"
+                                       placeholder="El DNI debe tener 8 dígitos" required
                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0.8);" />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                <input asp-for="fecha_nacimiento" type="date" class="form-control" required />
+                                <input asp-for="fecha_nacimiento" type="date" class="form-control" placeholder="Debe ser mayor de edad" required />
                             </div>
                             <div class="col-md-6">
-                                <label asp-for="estado" class="form-label">Estado</label>
-                                <input asp-for="estado" class="form-control" placeholder="Activo/Inactivo" required />
+                                <label asp-for="estado" class="form-label" fw-semibold">Estado</label>
+                                <select asp-for="estado" class="form-select" required>
+                                    <option value="En proceso">Activo</option>
+                                    <option value="Cortado">Inactivo</option>
+                                </select>
+                                <span asp-validation-for="estado" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="correo" class="form-label">Correo</label>
-                                <input asp-for="correo" class="form-control" type="email" placeholder="Correo electrónico" required />
+                                <input asp-for="correo" class="form-control" type="email" placeholder="Ejm: luis14@gmail.com" required />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="rol_id" class="form-label">Rol</label>
@@ -71,7 +75,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="password" class="form-label">Contraseña</label>
-                                <input asp-for="password" class="form-control" type="password" placeholder="Contraseña" required />
+                                <input asp-for="password" class="form-control" type="password" placeholder="Incluya mayúsculas, números y símbolos." required />
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="confirmarpassword" class="form-label">Confirmar Contraseña</label>

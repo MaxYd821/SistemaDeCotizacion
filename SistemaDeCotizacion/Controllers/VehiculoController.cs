@@ -118,6 +118,7 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext.Vehiculos.Remove(vehiculo);
             _appDBContext.SaveChanges();
 
+            TempData["mensaje"] = "Vehículo eliminado con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
     }

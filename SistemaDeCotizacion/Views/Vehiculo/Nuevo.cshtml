@@ -25,8 +25,8 @@
                         <div class="row g-3">
 
                             <div class="col-md-6">
-                                <label asp-for="modelo" class="form-label fw-semibold">Modelo del Vehículo</label>
-                                <input asp-for="modelo" class="form-control" required />
+                                <label asp-for="modelo" class="form-label fw-semibold">Modelo</label>
+                                <input asp-for="modelo" class="form-control" placeholder="Modelo del vehículo" required />
                                 <span asp-validation-for="modelo" class="text-danger"></span>
                             </div>
 
@@ -43,20 +43,20 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="marca" class="form-label fw-semibold">Marca del Vehículo</label>
-                                <input asp-for="marca" class="form-control" required />
+                                <label asp-for="marca" class="form-label fw-semibold">Marca</label>
+                                <input asp-for="marca" class="form-control" placeholder="Marca del vehiculo" required />
                                 <span asp-validation-for="marca" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="placa" class="form-label fw-semibold">Placa del Vehículo</label>
-                                <input asp-for="placa" class="form-control" required/>
+                                <label asp-for="placa" class="form-label fw-semibold">Placa</label>
+                                <input asp-for="placa" class="form-control" placeholder="Placa del vehículo" required/>
                                 <span asp-validation-for="placa" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="kilometraje" class="form-label fw-semibold">Kilometraje del Vehículo</label>
-                                <input asp-for="kilometraje" class="form-control" min="0" max="1000000" required
+                                <label asp-for="kilometraje" class="form-label fw-semibold">Kilometraje</label>
+                                <input asp-for="kilometraje" class="form-control" min="0" max="1000000" placeholder="Kilometraje del vehículo" required
                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                                 <span asp-validation-for="kilometraje" class="text-danger"></span>
                             </div>
