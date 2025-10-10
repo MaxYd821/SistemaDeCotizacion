@@ -5,19 +5,17 @@
     Layout = "_Layout";
 }
 
+@if (TempData["error"] != null)
+{
+    <div class="alerta-temporal alert alert-danger text-center">
+        @TempData["error"]
+    </div>
+}
 @if (TempData["mensaje"] != null)
 {
-    <div id="alerta-exito" class="alert alert-success text-center">
+    <div class="alerta-temporal alert alert-success text-center">
         @TempData["mensaje"]
     </div>
-    <script>
-        setTimeout(function () {
-            var alerta = document.getElementById('alerta-exito');
-            if (alerta) {
-                alerta.style.display = 'none';
-            }
-        }, 3000); // 3000 ms = 3 segundos
-    </script>
 }
 
 <div class="container py-5">
@@ -82,3 +80,25 @@
     </div>
 </div>
 
+<style>
+    .fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+</style>
+
+<script>
+    setTimeout(function () {
+        document.querySelectorAll('.alerta-temporal.alert-danger').forEach(alerta => {
+            alerta.classList.add('fade-out');
+            setTimeout(() => alerta.style.display = 'none', 500);
+        });
+    }, 5000);
+
+    setTimeout(function () {
+        document.querySelectorAll('.alerta-temporal.alert-success').forEach(alerta => {
+            alerta.classList.add('fade-out');
+            setTimeout(() => alerta.style.display = 'none', 500);
+        });
+    }, 3000);
+</script>

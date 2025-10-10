@@ -183,10 +183,20 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public IActionResult ConfirmacionEliminar(int id)
         {
-            var cliente = _appDBContext.Clientes.Find(id);
+            var cliente = _appDBContext.Clientes
+                .Include(c => c.vehiculos)
+                .FirstOrDefault(c => c.cliente_id == id);
+
             if (cliente == null)
             {
                 return NotFound();
+            }
+
+            if (cliente.vehiculos != null && cliente.vehiculos.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el cliente '{cliente.nombre_cliente}' porque hay vehículos asignados. " +
+                                    "Elimina primero a todos los vehículos que pertenecen a este cliente.";
+                return RedirectToAction(nameof(Mostrar));
             }
             _appDBContext.Clientes.Remove(cliente);
             _appDBContext.SaveChanges();

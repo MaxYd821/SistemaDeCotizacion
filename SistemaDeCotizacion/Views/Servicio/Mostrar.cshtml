@@ -7,7 +7,7 @@
 
 @if (TempData["mensaje"] != null)
 {
-    <div id="alert-success" class="alert alert-success text-center">
+    <div class="alerta-temporal alert alert-success text-center">
         @TempData["mensaje"]
     </div>
 }
@@ -67,15 +67,18 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var alert = document.getElementById('alert-success');
-            if (alert) {
-                setTimeout(function () {
-                    alert.style.display = 'none';
-                }, 3000); // 3000 ms = 3 segundos
-            }
+<style>
+    .fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+</style>
+
+<script>
+    setTimeout(function () {
+        document.querySelectorAll('.alerta-temporal').forEach(alerta => {
+            alerta.classList.add('fade-out');
+            setTimeout(() => alerta.style.display = 'none', 500);
         });
-    </script>
-}
+    }, 3000);
+</script>

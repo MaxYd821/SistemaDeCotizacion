@@ -105,10 +105,19 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public IActionResult ConfirmacionEliminar(int id)
         {
-            var rol = _appDBContext.Roles.Find(id);
+            var rol = _appDBContext.Roles
+                .Include(r => r.usuarios)
+                .FirstOrDefault(r => r.rol_id == id);
+
             if (rol == null)
-            {
                 return NotFound();
+
+            
+            if (rol.usuarios != null && rol.usuarios.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el rol '{rol.rol_nombre}' porque hay usuarios asignados. " +
+                                    "Elimina primero a todos los usuarios que tienen este rol.";
+                return RedirectToAction(nameof(Mostrar));
             }
 
             _appDBContext.Roles.Remove(rol);

@@ -50,7 +50,7 @@
 
                             <div class="col-md-4">
                                 <label asp-for="placa" class="form-label fw-semibold">Placa</label>
-                                <input asp-for="placa" class="form-control" placeholder="Placa del vehículo" required/>
+                                <input asp-for="placa" class="form-control" placeholder="Placa del vehículo" minlength="7" maxlength="7" title="La placa debe tener 7 dígitos/>
                                 <span asp-validation-for="placa" class="text-danger"></span>
                             </div>
 
