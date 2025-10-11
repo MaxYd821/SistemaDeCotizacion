@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
@@ -17,7 +18,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
         {
             var query = _appDBContext.Vehiculos
                 .Include(v => v.cliente)
@@ -31,7 +32,31 @@ namespace SistemaDeCotizacion.Controllers
                 );
             }
 
-            var vehiculos = await query.ToListAsync();
+            if (mes.HasValue)
+            {
+                query = query.Where(v => v.fecha_registro_vehiculo.Month == mes.Value);
+            }
+
+            if (anio.HasValue)
+            {
+                query = query.Where(v => v.fecha_registro_vehiculo.Year == anio.Value);
+            }
+
+            var vehiculos = await query
+                .OrderByDescending(v => v.fecha_registro_vehiculo)
+                .ToListAsync();
+
+            ViewBag.MesSeleccionado = mes;
+            ViewBag.AnioSeleccionado = anio;
+
+            ViewBag.Meses = Enumerable.Range(1, 12)
+                .Select(i => new SelectListItem
+                {
+                    Value = i.ToString(),
+                    Text = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    Selected = (i == mes)
+                })
+                .ToList();
 
             return View(vehiculos);
         }

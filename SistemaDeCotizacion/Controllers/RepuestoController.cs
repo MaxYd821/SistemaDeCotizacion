@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
@@ -15,19 +16,43 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
         {
             var query = _appDBContext.Repuestos.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(busqueda))
             {
-                query = query.Where(r =>
+                query = query.Where(r => 
                     r.codigo_rep.Contains(busqueda) ||
                     r.descripcion.Contains(busqueda)
                 );
             }
 
-            var repuestos = await query.ToListAsync();
+            if (mes.HasValue)
+            {
+                query = query.Where(r => r.fecha_registro_repuesto.Month == mes.Value);
+            }
+
+            if (anio.HasValue)
+            {
+                query = query.Where(r => r.fecha_registro_repuesto.Year == anio.Value);
+            }
+
+            var repuestos = await query
+                .OrderByDescending(r => r.fecha_registro_repuesto)
+                .ToListAsync();
+
+            ViewBag.MesSeleccionado = mes;
+            ViewBag.AnioSeleccionado = anio;
+
+            ViewBag.Meses = Enumerable.Range(1, 12)
+                .Select(i => new SelectListItem
+                {
+                    Value = i.ToString(),
+                    Text = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    Selected = (i == mes)
+                })
+                .ToList();
             return View(repuestos);
         }
 

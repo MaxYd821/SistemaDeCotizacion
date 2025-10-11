@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
 using SistemaDeCotizacion.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace SistemaDeCotizacion.Controllers
 {
@@ -15,7 +16,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
         {
             var query = _appDBContext.Clientes.AsQueryable();
 
@@ -27,7 +28,31 @@ namespace SistemaDeCotizacion.Controllers
                 );
             }
 
-            var clientes = await query.ToListAsync();
+            if (mes.HasValue)
+            {
+                query = query.Where(c => c.fecha_registro_cliente.Month == mes.Value);
+            }
+
+            if (anio.HasValue)
+            {
+                query = query.Where(c => c.fecha_registro_cliente.Year == anio.Value);
+            }
+
+            var clientes = await query
+                .OrderByDescending(c => c.fecha_registro_cliente)
+                .ToListAsync();
+
+            ViewBag.MesSeleccionado = mes;
+            ViewBag.AnioSeleccionado = anio;
+
+            ViewBag.Meses = Enumerable.Range(1, 12)
+                .Select(i => new SelectListItem
+                {
+                    Value = i.ToString(),
+                    Text = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    Selected = (i == mes)
+                })
+                .ToList();
             return View(clientes);
         }
 

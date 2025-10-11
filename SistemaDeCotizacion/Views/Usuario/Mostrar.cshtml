@@ -25,6 +25,17 @@
                     <input type="text" name="busqueda" value="@(Context.Request.Query["busqueda"])" class="form-control" placeholder="Buscar por nombre, apellido, rol o DNI..." />
                     <button type="submit" class="btn btn-dark">Buscar</button>
                 </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-3">
+                        <select asp-items="ViewBag.Meses" name="mes" class="form-select">
+                            <option value="">-- Seleccionar mes --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="anio" value="@(ViewBag.AnioSeleccionado ?? DateTime.Now.Year)" class="form-control" placeholder="Año" />
+                    </div>
+                </div>
             </form>
 
             @if (!Model.Any())
