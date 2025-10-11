@@ -6,6 +6,9 @@ using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 
 namespace Test_SDC;
 
@@ -38,6 +41,11 @@ public class ClienteTest
         _context.SaveChanges();
 
         _controller = new ClienteController(_context);
+
+        _controller.TempData = new TempDataDictionary(
+        new DefaultHttpContext(),
+        Mock.Of<ITempDataProvider>()
+        );
     }
 
     [TestMethod]
@@ -179,6 +187,90 @@ public class ClienteTest
         Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
         var cliente = _context.Clientes.Find(1);
         Assert.IsNull(cliente);
+    }
+
+    [TestMethod]
+    public async Task Mostrar_FiltraPorBusqueda()
+    {
+        // Arrange
+        _context.Clientes.AddRange(
+            new Cliente
+            {
+                nombre_cliente = "María López",
+                correo_cliente = "maria@correo.com",
+                ruc = "87654321",
+                fecha_registro_cliente = DateTime.Now,
+                telefono_cliente = "111111111",
+                direccion_cliente = "Calle A",
+                tipo = "Persona Natural"
+            },
+            new Cliente
+            {
+                nombre_cliente = "Carlos Ramírez",
+                correo_cliente = "carlos@correo.com",
+                ruc = "22223333",
+                fecha_registro_cliente = DateTime.Now,
+                telefono_cliente = "222222222",
+                direccion_cliente = "Calle B",
+                tipo = "Persona Natural"
+            }
+        );
+        _context.SaveChanges();
+
+        // Act
+        var result = await _controller.Mostrar("Carlos");
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(ViewResult));
+        var viewResult = result as ViewResult;
+        var model = viewResult.Model as List<Cliente>;
+
+        Assert.IsNotNull(model);
+        Assert.AreEqual(1, model.Count);
+        Assert.AreEqual("Carlos Ramírez", model.First().nombre_cliente);
+    }
+
+    [TestMethod]
+    public void ConfirmacionEliminar_ClienteConVehiculos_NoDebeEliminarse()
+    {
+        // Arrange
+        var cliente = new Cliente
+        {
+            cliente_id = 2,
+            nombre_cliente = "Cliente con Vehiculo",
+            correo_cliente = "vehiculo@cliente.com",
+            ruc = "11223344",
+            fecha_registro_cliente = DateTime.Now,
+            telefono_cliente = "999999999",
+            direccion_cliente = "Calle Vehicular 123",
+            tipo = "Persona Natural",
+            vehiculos = new List<Vehiculo>
+        {
+            new Vehiculo
+            {
+                vehiculo_id = 1,
+                marca = "Toyota",
+                modelo = "Corolla",
+                placa = "ABC-123",
+                fecha_registro_vehiculo = DateTime.Now,
+                kilometraje = 10000,
+                cliente_id = 2
+            }
+        }
+        };
+
+        _context.Clientes.Add(cliente);
+        _context.SaveChanges();
+
+        // Act
+        var result = _controller.ConfirmacionEliminar(cliente.cliente_id);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
+        var redirect = result as RedirectToActionResult;
+        Assert.AreEqual("Mostrar", redirect.ActionName);
+        Assert.IsTrue(_controller.TempData.ContainsKey("error"));
+        StringAssert.Contains(_controller.TempData["error"].ToString(), "No se puede eliminar el cliente");
     }
 }
 

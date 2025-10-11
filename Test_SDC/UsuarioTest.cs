@@ -4,6 +4,9 @@ using SistemaDeCotizacion.Controllers;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
 using SistemaDeCotizacion.ViewModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +30,14 @@ namespace Test_SDC
 
             _context = new AppDBContext(options);
 
+            _context.Roles.Add(new Rol
+            {
+                rol_id = 1,
+                rol_nombre = "Administrador",
+                rol_descripcion = "Rol de prueba"
+            });
+            _context.SaveChanges();
+
             _context.Usuarios.Add(new Usuario
             {
                 usuario_id=1,
@@ -36,7 +47,7 @@ namespace Test_SDC
                 dni="12345678",
                 fecha_registro=DateTime.Now,
                 fecha_nacimiento = new DateTime(1990, 1, 1),
-                estado="activo",
+                estado="Activo",
                 correo="test@correo.com",
                 password="12345",
                 rol_id=1
@@ -44,6 +55,11 @@ namespace Test_SDC
             _context.SaveChanges();
 
             _usuarioController = new UsuarioController(_context);
+
+            _usuarioController.TempData = new TempDataDictionary(
+                new DefaultHttpContext(),
+                Mock.Of<ITempDataProvider>()
+            );
         }
 
         [TestMethod]
@@ -229,5 +245,50 @@ namespace Test_SDC
             Assert.AreEqual("Mostrar", redirect.ActionName);
         }
 
+        [TestMethod]
+        public async Task TestBusquedaUsuariosPorNombre()
+        {
+            // Arrange
+            // Se asegura que haya al menos dos usuarios
+            _context.Usuarios.AddRange(
+                new Usuario
+                {
+                    nombre = "Carlos",
+                    apellido = "Ramírez",
+                    correo = "carlos@correo.com",
+                    password = "12345",
+                    dni = "11112222",
+                    num_cel = "999999999",
+                    estado = "Activo",
+                    fecha_nacimiento = new DateTime(1995, 5, 10),
+                    rol_id = 1
+                },
+                new Usuario
+                {
+                    nombre = "Andrea",
+                    apellido = "Lopez",
+                    correo = "andrea@correo.com",
+                    password = "12345",
+                    dni = "33334444",
+                    num_cel = "888888888",
+                    estado = "Activo",
+                    fecha_nacimiento = new DateTime(1992, 3, 15),
+                    rol_id = 1
+                }
+            );
+            _context.SaveChanges();
+
+            // Act
+            var result = await _usuarioController.Mostrar("Carlos");
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            var model = viewResult.Model as List<Usuario>;
+
+            Assert.IsNotNull(model);
+            Assert.AreEqual(1, model.Count); // Solo debe devolver un usuario
+            Assert.AreEqual("Carlos", model.First().nombre);
+        }
     }
 }

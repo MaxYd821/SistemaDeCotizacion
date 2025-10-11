@@ -103,8 +103,8 @@ namespace Test_SDC
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
             var redirect = result as RedirectToActionResult;
-            Assert.AreEqual("Index", redirect.ActionName);
-            Assert.AreEqual("Home", redirect.ControllerName);
+            Assert.AreEqual("Mostrar", redirect.ActionName);
+            Assert.AreEqual("Cliente", redirect.ControllerName);
         }
 
         [TestMethod]

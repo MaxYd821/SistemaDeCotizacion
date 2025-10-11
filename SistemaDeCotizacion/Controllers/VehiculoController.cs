@@ -17,11 +17,22 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar()
+        public async Task<IActionResult> Mostrar(string busqueda = null)
         {
-            var vehiculos = await _appDBContext.Vehiculos
+            var query = _appDBContext.Vehiculos
                 .Include(v => v.cliente)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(v =>
+                    v.placa.Contains(busqueda) ||
+                    v.cliente.nombre_cliente.Contains(busqueda)
+                );
+            }
+
+            var vehiculos = await query.ToListAsync();
+
             return View(vehiculos);
         }
 
