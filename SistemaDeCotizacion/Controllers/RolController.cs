@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace SistemaDeCotizacion.Controllers
 {
+    [Authorize]
     public class RolController : Controller
     {
         private readonly AppDBContext _appDBContext;

@@ -1,0 +1,174 @@
+﻿@model SistemaDeCotizacion.ViewModels.CotizacionVM
+@{
+    ViewData["Title"] = "Editar Cotización";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Editar Cotización</h4>
+                </div>
+                <div class="card-body bg-light">
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">@ViewData["mensaje"]</div>
+                    }
+
+                    <form asp-action="Editar" method="post">
+                        <input asp-for="CotizacionId" type="hidden" />
+                        <div class="mb-3">
+                            <label>Cliente</label>
+                            <select id="clienteSelect" asp-for="ClienteId" class="form-select">
+                                <option value="">-- Seleccione un cliente --</option>
+                                @foreach (var c in Model.Clientes)
+                                {
+                                    <option value="@c.cliente_id">@c.nombre_cliente (RUC/DNI: @c.ruc)</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3"> 
+                            <label>Vehículo</label> 
+                            <select id="vehiculoSelect" asp-for="VehiculoId" class="form-select"> 
+                                <option value="">-- Seleccione un vehículo --</option> 
+                                @foreach (var v in Model.Vehiculos) 
+                                { 
+                                    if (v.vehiculo_id == Model.VehiculoId) 
+                                    {
+                                        <option value="@v.vehiculo_id" selected> @v.placa (@v.marca - @v.modelo) </option>
+                                    }
+                                    else
+                                    {
+                                    <option value="@v.vehiculo_id"> @v.placa (@v.marca - @v.modelo) </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Servicios</label>
+                            <div id="serviciosContainer">
+                                <div class="d-flex align-items-center mb-2 servicio-row">
+                                    <select name="ServiciosSeleccionados[0].ServicioId" class="form-select me-2" style="flex: 2">
+                                        <option value="">-- Seleccione un servicio --</option>
+                                        @foreach (var s in Model.Servicios)
+                                        {
+                                            <option value="@s.servicio_id">@s.nombre_servicio - S/. @s.precio</option>
+                                        }
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary ms-2 agregarServicio">+</button>
+                                    <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+
+                                </div>
+							</div>
+						</div>
+
+                        <div class="mb-3">
+                            <label>Repuestos</label>
+                            <div id="repuestosContainer">
+                                <div class="d-flex align-items-center mb-2 repuesto-row">
+                                    <select name="RepuestosSeleccionados[0].RepuestoId" class="form-select me-2" style="flex: 2">
+                                        <option value="">-- Seleccione un repuesto --</option>
+                                        @foreach (var r in Model.Repuestos)
+                                        {
+                                            <option value="@r.repuesto_id">@r.descripcion (Stock: @r.stock)</option>
+                                            <span asp-validation-for="@r.repuesto_id" class="text-danger"></span>
+                                        }
+                                    </select>
+                                    <input name="RepuestosSeleccionados[0].Cantidad" type="number" class="form-control" style="width:100px" min="1" placeholder="Cant." />
+                                    <button type="button" class="btn btn-outline-secondary ms-2 agregarRepuesto">+</button>
+                                    <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="formaPago" class="form-label">Forma de Pago</label>
+                                <input asp-for="formaPago" class="form-control" placeholder="Efectivo, transferencia..." required />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="tiempoEntrega" class="form-label">Tiempo de entrega (días)</label>
+                                <input asp-for="tiempoEntrega" type="number" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Estado</label>
+                            <select asp-for="estado_cotizacion" class="form-select">
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Aprobado">Aprobado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Mostrar" class="btn btn-outline-dark">Volver</a>
+                            <button type="submit" class="btn btn-dark">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cargar vehículos según cliente seleccionado
+    document.getElementById('clienteSelect').addEventListener('change', function () {
+        var clienteId = this.value;
+        var vehiculoSelect = document.getElementById('vehiculoSelect');
+        vehiculoSelect.innerHTML = '';
+
+        if (clienteId) {
+            fetch(`/Cotizacion/ObtenerVehiculosPorCliente?clienteId=${clienteId}`)
+                .then(r => r.json())
+                .then(data => {
+                    vehiculoSelect.innerHTML = '<option value="">-- Seleccione un vehículo --</option>';
+                    data.forEach(v => {
+                        vehiculoSelect.innerHTML += `<option value="${v.vehiculo_id}">${v.placa}</option>`;
+                    });
+                });
+        }
+    });
+
+    // Agregar nuevas filas de repuestos
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('agregarRepuesto')) {
+            const container = document.getElementById('repuestosContainer');
+            const rows = container.querySelectorAll('.repuesto-row');
+            const newIndex = rows.length;
+
+            const nuevaFila = rows[0].cloneNode(true);
+            nuevaFila.querySelector('select').name = `RepuestosSeleccionados[${newIndex}].RepuestoId`;
+            nuevaFila.querySelector('input').name = `RepuestosSeleccionados[${newIndex}].Cantidad`;
+            nuevaFila.querySelector('input').value = '';
+            container.appendChild(nuevaFila);
+        }
+    });
+
+    // Agregar nuevas filas de servicios
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('agregarServicio')) {
+            const container = document.getElementById('serviciosContainer');
+            const rows = container.querySelectorAll('.servicio-row');
+            const newIndex = rows.length;
+
+            const nuevaFila = rows[0].cloneNode(true);
+            nuevaFila.querySelector('select').name = `ServiciosSeleccionados[${newIndex}].ServicioId`;
+            nuevaFila.querySelector('select').selectedIndex = 0;
+            container.appendChild(nuevaFila);
+        }
+    });
+
+        // Eliminar fila dinámica
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('eliminarFila')) {
+            const row = e.target.closest('.servicio-row, .repuesto-row');
+            if (row) row.remove();
+        }
+    });
+</script>

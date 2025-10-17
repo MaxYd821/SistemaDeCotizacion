@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SistemaDeCotizacion.Controllers
 {
+    [Authorize]
     public class VehiculoController : Controller
     {
         private readonly AppDBContext _appDBContext;

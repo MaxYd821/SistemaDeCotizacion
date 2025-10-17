@@ -14,6 +14,8 @@ namespace SistemaDeCotizacion.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime fecha_cotizacion { get; set; }
         public int tiempoEntrega { get; set; }
+        public int? cliente_id { get; set; }
+        public Cliente cliente { get; set; }
         public ICollection<DetalleServicio> servicios { get; set; }
         public ICollection<DetalleRepuesto> repuestos { get; set; }
     }

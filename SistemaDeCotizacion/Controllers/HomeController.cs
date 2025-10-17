@@ -1,6 +1,8 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using SistemaDeCotizacion.Models;
+using System.Diagnostics;
 
 namespace SistemaDeCotizacion.Controllers
 {
@@ -29,8 +31,10 @@ namespace SistemaDeCotizacion.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult Salir()
+        public async Task<IActionResult> Salir()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             return RedirectToAction("Login", "Cuenta");
         }
     }

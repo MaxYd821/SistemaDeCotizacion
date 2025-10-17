@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
@@ -6,6 +7,7 @@ using SistemaDeCotizacion.Models;
 
 namespace SistemaDeCotizacion.Controllers
 {
+    [Authorize]
     public class RepuestoController : Controller
     {
         private readonly AppDBContext _appDBContext;

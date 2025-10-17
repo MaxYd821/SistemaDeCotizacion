@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using SistemaDeCotizacion.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Inicializar QuestPDF (licencia gratuita)
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddDbContext<AppDBContext>(options => {
 
