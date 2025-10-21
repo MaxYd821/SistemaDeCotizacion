@@ -38,7 +38,7 @@
                             
                             <div class="col-md-6">
                                 <label asp-for="stock" class="form-label fw-semibold">Stock</label>
-                                <input asp-for="stock" class="form-control" type="number" placeholder="Stock del repuesto" required />
+                                <input asp-for="stock" class="form-control" type="number" placeholder="Stock del repuesto" required oninput="this.value = this.value.replace(/[^0-9]/g, '');"  />
                                 <span asp-validation-for="stock" class="text-danger"></span>
                             </div>
 

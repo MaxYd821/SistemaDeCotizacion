@@ -58,7 +58,7 @@
 
                         <div class="col-md-6">
                             <label asp-for="medida_rep" class="form-label fw-semibold">Medida</label>
-                            <input asp-for="medida_rep" class="form-control" placeholder="Medida del repuesto" required />
+                            <input asp-for="medida_rep" class="form-control" placeholder="Medida del repuesto" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
                             <span asp-validation-for="medida_rep" class="text-danger"></span>
                         </div>
 

@@ -35,6 +35,14 @@
                     <div class="col-md-3">
                         <input type="number" name="anio" value="@(ViewBag.AnioSeleccionado ?? DateTime.Now.Year)" class="form-control" placeholder="Año" />
                     </div>
+                    <div class="col-md-3">
+                        <select name="estado" class="form-select">
+                            <option value="">-- Seleccionar estado --</option>
+                            <option value="Pendiente" selected="@(ViewBag.EstadoSeleccionado == "Pendiente")">Pendiente</option>
+                            <option value="Aprobado" selected="@(ViewBag.EstadoSeleccionado == "Aprobado")">Aprobado</option>
+                            <option value="Cancelado" selected="@(ViewBag.EstadoSeleccionado == "Cancelado")">Cancelado</option>
+                        </select>
+                    </div>
                 </div>
             </form>
 

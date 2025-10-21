@@ -20,7 +20,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, string estado = null)
         {
             var query = _appDBContext.Cotizaciones
                 .Include(c => c.cliente)
@@ -42,10 +42,13 @@ namespace SistemaDeCotizacion.Controllers
             {
                 query = query.Where(c => c.fecha_cotizacion.Month == mes.Value);
             }
-
             if (anio.HasValue)
             {
                 query = query.Where(c => c.fecha_cotizacion.Year == anio.Value);
+            }
+            if (!string.IsNullOrEmpty(estado))
+            {
+                query = query.Where(c => c.estado_cotizacion == estado);
             }
 
             var cotizaciones = await query
@@ -54,6 +57,7 @@ namespace SistemaDeCotizacion.Controllers
 
             ViewBag.MesSeleccionado = mes;
             ViewBag.AnioSeleccionado = anio;
+            ViewBag.EstadoSeleccionado = estado;
 
             ViewBag.Meses = Enumerable.Range(1, 12)
                 .Select(i => new SelectListItem
@@ -302,7 +306,6 @@ namespace SistemaDeCotizacion.Controllers
                 cotizacion.formaPago = model.formaPago;
                 cotizacion.tiempoEntrega = model.tiempoEntrega;
                 cotizacion.estado_cotizacion = model.estado_cotizacion;
-                cotizacion.fecha_cotizacion = DateTime.Now;
                 cotizacion.servicios = new List<DetalleServicio>();
                 cotizacion.repuestos = new List<DetalleRepuesto>();
 

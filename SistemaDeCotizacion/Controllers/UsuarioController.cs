@@ -207,7 +207,13 @@ namespace SistemaDeCotizacion.Controllers
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
-            var idUsuario = _appDBContext.Usuarios.Find(id);
+            var idUsuario = _appDBContext.Usuarios
+                .Include(u => u.rol)
+                .FirstOrDefault(u => u.usuario_id == id);
+
+            if (idUsuario == null)
+                return NotFound();
+
             return View(idUsuario);
         }
         [HttpPost]
