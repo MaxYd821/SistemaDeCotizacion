@@ -51,39 +51,85 @@
                         <div class="mb-3">
                             <label>Servicios</label>
                             <div id="serviciosContainer">
-                                <div class="d-flex align-items-center mb-2 servicio-row">
-                                    <select name="ServiciosSeleccionados[0].ServicioId" class="form-select me-2" style="flex: 2">
-                                        <option value="">-- Seleccione un servicio --</option>
-                                        @foreach (var s in Model.Servicios)
-                                        {
-                                            <option value="@s.servicio_id">@s.nombre_servicio - S/. @s.precio</option>
-                                        }
-                                    </select>
-                                    <button type="button" class="btn btn-outline-secondary ms-2 agregarServicio">+</button>
-                                    <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
-
-                                </div>
-							</div>
-						</div>
+                                @if (Model.ServiciosSeleccionados.Any())
+                                {
+                                    @for (int i = 0; i < Model.ServiciosSeleccionados.Count; i++)
+                                    {
+                                        var seleccionado = Model.ServiciosSeleccionados[i];
+                                        <div class="d-flex align-items-center mb-2 servicio-row">
+                                            <select name="ServiciosSeleccionados[@i].ServicioId" class="form-select me-2" style="flex: 2">
+                                                <option value="">-- Seleccione un servicio --</option>
+                                                @foreach (var s in Model.Servicios)
+                                                {
+                                                    <option value="@s.servicio_id" selected="@(seleccionado.ServicioId == s.servicio_id ? "selected" : null)">
+                                                        #@s.nombre_servicio - S/. @s.precio
+                                                    </option>
+                                                }
+                                            </select>
+                                            <button type="button" class="btn btn-outline-secondary ms-2 agregarServicio">+</button>
+                                            <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center mb-2 servicio-row">
+                                        <select name="ServiciosSeleccionados[0].ServicioId" class="form-select me-2" style="flex: 2">
+                                            <option value="">-- Seleccione un servicio --</option>
+                                            @foreach (var s in Model.Servicios)
+                                            {
+                                                <option value="@s.servicio_id">@s.nombre_servicio - S/. @s.precio</option>
+                                            }
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary ms-2 agregarServicio">+</button>
+                                        <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
 
                         <div class="mb-3">
                             <label>Repuestos</label>
                             <div id="repuestosContainer">
-                                <div class="d-flex align-items-center mb-2 repuesto-row">
-                                    <select name="RepuestosSeleccionados[0].RepuestoId" class="form-select me-2" style="flex: 2">
-                                        <option value="">-- Seleccione un repuesto --</option>
-                                        @foreach (var r in Model.Repuestos)
-                                        {
-                                            <option value="@r.repuesto_id">@r.descripcion (Stock: @r.stock)</option>
-                                            <span asp-validation-for="@r.repuesto_id" class="text-danger"></span>
-                                        }
-                                    </select>
-                                    <input name="RepuestosSeleccionados[0].Cantidad" type="number" class="form-control" style="width:100px" min="1" placeholder="Cant." />
-                                    <button type="button" class="btn btn-outline-secondary ms-2 agregarRepuesto">+</button>
-                                    <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
-                                </div>
+                                @if (Model.RepuestosSeleccionados.Any())
+                                {
+                                    @for (int i = 0; i < Model.RepuestosSeleccionados.Count; i++)
+                                    {
+                                        var rep = Model.RepuestosSeleccionados[i];
+                                        <div class="d-flex align-items-center mb-2 repuesto-row">
+                                            <select name="RepuestosSeleccionados[@i].RepuestoId" class="form-select me-2" style="flex: 2">
+                                                <option value="">-- Seleccione un repuesto --</option>
+                                                @foreach (var r in Model.Repuestos)
+                                                {
+                                                    <option value="@r.repuesto_id" selected="@(rep.RepuestoId == r.repuesto_id ? "selected" : null)">
+                                                        #@r.descripcion (Stock: @r.stock)
+                                                    </option>
+                                                }
+                                            </select>
+                                            <input name="RepuestosSeleccionados[@i].Cantidad" type="number" class="form-control" style="width:100px" min="1" value="@rep.Cantidad" placeholder="Cant." />
+                                            <button type="button" class="btn btn-outline-secondary ms-2 agregarRepuesto">+</button>
+                                            <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center mb-2 repuesto-row">
+                                        <select name="RepuestosSeleccionados[0].RepuestoId" class="form-select me-2" style="flex: 2">
+                                            <option value="">-- Seleccione un repuesto --</option>
+                                            @foreach (var r in Model.Repuestos)
+                                            {
+                                                <option value="@r.repuesto_id">@r.descripcion (Stock: @r.stock)</option>
+                                            }
+                                        </select>
+                                        <input name="RepuestosSeleccionados[0].Cantidad" type="number" class="form-control" style="width:100px" min="1" placeholder="Cant." />
+                                        <button type="button" class="btn btn-outline-secondary ms-2 agregarRepuesto">+</button>
+                                        <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
+                                    </div>
+                                }
                             </div>
                         </div>
+
 
                         <div class="row mb-3">
                             <div class="col-md-6">

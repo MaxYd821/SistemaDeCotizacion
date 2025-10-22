@@ -1,0 +1,61 @@
+﻿@model SistemaDeCotizacion.Models.Ingreso
+@{
+    ViewData["Title"] = "Registrar Ingreso";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Registrar Nuevo Ingreso</h4>
+                </div>
+                <div class="card-body bg-light">
+
+                    @if (ViewData["mensaje"] != null)
+                    {
+                        <div class="alert alert-danger text-center">
+                            @ViewData["mensaje"]
+                        </div>
+                    }
+
+                    <form asp-action="Nuevo" asp-controller="Ingreso" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Cotización</label>
+                                <select id="cotizacion_id" name="cotizacion_id" class="form-control" required>
+                                    <option value="">-- Seleccione una cotización aprobada --</option>
+                                    @foreach (var cot in ViewBag.Cotizaciones)
+                                    {
+                                        <option value="@cot.cotizacion_id">
+                                            #@cot.cotizacion_id - @cot.cliente.nombre_cliente (@cot.estado_cotizacion)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="fecha_ingreso">Fecha de ingreso</label>
+                                <input asp-for="fecha_ingreso" type="date" class="form-control" required/>
+                                <span asp-validation-for="fecha_ingreso" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="tipo_ingreso" class="form-label fw-semibold">Tipo</label>
+                                <select asp-for="tipo_ingreso" class="form-select" required>
+                                    <option value="Ingreso Directo">Ingreso Directo</option>
+                                    <option value="Por Cotización">Por Cotización</option>
+                                </select>
+                                <span asp-validation-for="tipo_ingreso" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-controller="Ingreso" asp-action="Mostrar" class="btn btn-outline-dark">Volver</a>
+                            <button type="submit" class="btn btn-dark">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

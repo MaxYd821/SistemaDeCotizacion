@@ -72,14 +72,16 @@
                             <li class="nav-item"><a class="nav-link" asp-controller="Servicio" asp-action="Mostrar">Servicios</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Repuesto" asp-action="Mostrar">Repuestos</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Cotizacion" asp-action="Mostrar">Cotizaciones</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Ingreso" asp-action="Mostrar">Ingreso</a></li>
                         }
-                        @if (rolUsuario == "Encargado de Logistica")
+                        @if (rolUsuario == "Encargado de Logística")
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Cliente" asp-action="Mostrar">Clientes</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Vehiculo" asp-action="Mostrar">Vehículos</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Servicio" asp-action="Mostrar">Servicios</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Repuesto" asp-action="Mostrar">Repuestos</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Cotizacion" asp-action="Mostrar">Cotizaciones</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Ingreso" asp-action="Mostrar">Ingreso</a></li>
                         }
                         @if (User.Identity.IsAuthenticated)
                         {

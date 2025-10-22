@@ -1,0 +1,44 @@
+﻿@model SistemaDeCotizacion.Models.Ingreso
+
+@{
+    ViewData["Title"] = "Eliminar Ingreso";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Confirmar Eliminación</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <p class="fs-5">
+                        ¿Estás seguro que deseas eliminar el ingreso con la
+                        <strong class="text-dark">ID de la Cotización: @ViewBag.CotizacionSeleccionada</strong>?
+                    </p>
+
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4">Tipo:</dt>
+                        <dd class="col-sm-8">@Model.tipo_ingreso</dd>
+                        <dt class="col-sm-4">Costo Total (S/.):</dt>
+                        <dd class="col-sm-8">@Model.costo_ingreso</dd>
+                        <dt class="col-sm-4">Fecha del Ingreso:</dt>
+                        <dd class="col-sm-8">@Model.fecha_ingreso.ToString("dd-MM-yyyy")</dd>
+                        <dt class="col-sm-4">Fecha de Registro:</dt>
+                        <dd class="col-sm-8">@Model.fecha_registro_ingreso.ToString("dd-MM-yyyy")</dd>
+                    </dl>
+
+                    <form asp-controller="Ingreso" asp-action="ConfirmacionEliminar" method="post">
+                        <input type="hidden" name="id" value="@Model.ingreso_id" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-controller="Ingreso" asp-action="Mostrar" class="btn btn-outline-dark">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -55,7 +55,11 @@ namespace SistemaDeCotizacion.Controllers
                 .Select(i => new SelectListItem
                 {
                     Value = i.ToString(),
-                    Text = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    Text = System.Globalization.CultureInfo
+                    .GetCultureInfo("es-ES")
+                    .DateTimeFormat
+                    .GetMonthName(i)
+                    .ToUpper(),
                     Selected = (i == mes)
                 })
                 .ToList();
