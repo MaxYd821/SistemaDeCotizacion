@@ -124,6 +124,8 @@ namespace SistemaDeCotizacion.Controllers
                     return View(model);
                 }
 
+                var trabajador = User.Identity?.Name ?? "Desconocido";
+
                 double totalServicios = 0;
                 double totalRepuestos = 0;
 
@@ -134,6 +136,7 @@ namespace SistemaDeCotizacion.Controllers
                     formaPago = model.formaPago,
                     tiempoEntrega = model.tiempoEntrega,
                     estado_cotizacion = model.estado_cotizacion,
+                    trabajador = trabajador,
                     servicios = new List<DetalleServicio>(),
                     repuestos = new List<DetalleRepuesto>()
                 };
@@ -231,6 +234,7 @@ namespace SistemaDeCotizacion.Controllers
                 formaPago = cotizacion.formaPago,
                 tiempoEntrega = cotizacion.tiempoEntrega,
                 estado_cotizacion = cotizacion.estado_cotizacion,
+                trabajador = cotizacion.trabajador,
 
                 ServiciosSeleccionados = cotizacion.servicios.Select(s => new ServicioSeleccionadoVM
                 {
@@ -417,6 +421,17 @@ namespace SistemaDeCotizacion.Controllers
             if (cotizacion == null)
             {
                 return NotFound();
+            }
+
+            var ingresoAsociado = _appDBContext.Ingresos
+                .FirstOrDefault(i => i.detalle_ingreso.Contains($"#{cotizacion.cotizacion_id}"));
+
+            if (ingresoAsociado != null)
+            {
+                TempData["error"] = $"No se puede eliminar la cotización #{cotizacion.cotizacion_id} porque está asociada " +
+                                    $"al ingreso ID: {ingresoAsociado.ingreso_id}. " +
+                                    $"Por favor, elimine primero dicho ingreso.";
+                return RedirectToAction(nameof(Mostrar));
             }
 
             foreach (var dr in cotizacion.repuestos)

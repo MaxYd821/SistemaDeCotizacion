@@ -100,6 +100,7 @@ namespace SistemaDeCotizacion.Data
                 tb.Property(col => col.costo_servicio_total).HasPrecision(10, 2);
                 tb.Property(col => col.formaPago).HasMaxLength(50);
                 tb.Property(col => col.tiempoEntrega);
+                tb.Property(col => col.trabajador).HasMaxLength(50);
                 tb.HasOne(co => co.cliente)
                     .WithMany(cl => cl.cotizaciones)
                     .HasForeignKey(co => co.cliente_id)

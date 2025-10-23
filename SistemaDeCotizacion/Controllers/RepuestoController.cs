@@ -178,10 +178,20 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public IActionResult ConfirmacionEliminar(int id)
         {
-            var repuesto = _appDBContext.Repuestos.Find(id);
+            var repuesto = _appDBContext.Repuestos
+                .Include(r => r.detalle_repuesto)
+                .FirstOrDefault(r => r.repuesto_id == id);
+            
             if (repuesto == null)
             {
                 return NotFound();
+            }
+
+            if (repuesto.detalle_repuesto != null && repuesto.detalle_repuesto.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el repuesto '{repuesto.descripcion}' porque hay cotizaciones asignadas. " +
+                                    "Elimina primero a todas las cotizaciones que pertenecen a este repuesto.";
+                return RedirectToAction(nameof(Mostrar));
             }
 
             _appDBContext.Repuestos.Remove(repuesto);

@@ -152,6 +152,7 @@ namespace SistemaDeCotizacion.Controllers
         public IActionResult ConfirmacionEliminar(int id)
         {
             var vehiculo = _appDBContext.Vehiculos.Find(id);
+
             if (vehiculo == null)
             {
                 return NotFound();

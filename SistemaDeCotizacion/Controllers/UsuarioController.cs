@@ -223,10 +223,20 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public IActionResult ConfirmacionEliminar(int id)
         {
-            var usuario = _appDBContext.Usuarios.Find(id);
+            var usuario = _appDBContext.Usuarios
+                .Include(u => u.ingresos)
+                .FirstOrDefault(u => u.usuario_id == id);
+
             if (usuario == null)
             {
                 return NotFound();
+            }
+
+            if (usuario.ingresos != null && usuario.ingresos.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el usuario '{usuario.nombre}' '{usuario.apellido}' porque hay ingresos asociados. " +
+                                    "Elimina primero a todas los ingresos que pertenecen a este usuario.";
+                return RedirectToAction(nameof(Mostrar));
             }
             _appDBContext.Usuarios.Remove(usuario);
             _appDBContext.SaveChanges();

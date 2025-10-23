@@ -217,6 +217,7 @@ namespace SistemaDeCotizacion.Controllers
         {
             var cliente = _appDBContext.Clientes
                 .Include(c => c.vehiculos)
+                .Include(c => c.cotizaciones)
                 .FirstOrDefault(c => c.cliente_id == id);
 
             if (cliente == null)
@@ -228,6 +229,13 @@ namespace SistemaDeCotizacion.Controllers
             {
                 TempData["error"] = $"No se puede eliminar el cliente '{cliente.nombre_cliente}' porque hay vehículos asignados. " +
                                     "Elimina primero a todos los vehículos que pertenecen a este cliente.";
+                return RedirectToAction(nameof(Mostrar));
+            }
+
+            if (cliente.cotizaciones != null && cliente.cotizaciones.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el cliente '{cliente.nombre_cliente}' porque hay cotizaciones asignadas. " +
+                                    "Elimina primero a todas las cotizaciones que pertenecen a este cliente.";
                 return RedirectToAction(nameof(Mostrar));
             }
             _appDBContext.Clientes.Remove(cliente);

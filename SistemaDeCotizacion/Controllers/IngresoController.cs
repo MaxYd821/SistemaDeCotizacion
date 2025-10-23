@@ -19,7 +19,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, string tipo = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
         {
             var query = _appDBContext.Ingresos
                 .Include(i => i.usuario)
@@ -32,10 +32,6 @@ namespace SistemaDeCotizacion.Controllers
                 query = query.Where(i =>
                     i.usuario.nombre.Contains(busqueda) ||
                     i.usuario.apellido.Contains(busqueda) ||
-                    i.usuario.clientes.Any(c =>
-                        c.nombre_cliente.Contains(busqueda) ||
-                        c.ruc.Contains(busqueda)
-                    ) ||
                     i.tipo_ingreso.Contains(busqueda)
                 );
             }

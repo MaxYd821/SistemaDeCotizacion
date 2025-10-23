@@ -5,6 +5,12 @@
     Layout = "_Layout";
 }
 
+@if (TempData["error"] != null)
+{
+    <div class="alerta-temporal alert alert-danger text-center">
+        @TempData["error"]
+    </div>
+}
 @if (TempData["mensaje"] != null)
 {
     <div class="alerta-temporal alert alert-success text-center">
@@ -22,7 +28,7 @@
 
             <form asp-action="Mostrar" method="get" class="mb-4">
                 <div class="input-group">
-                    <input type="text" name="busqueda" value="@(Context.Request.Query["busqueda"])" class="form-control" placeholder="Buscar por nombre o RUC/DNI del cliente" />
+                    <input type="text" name="busqueda" value="@(Context.Request.Query["busqueda"])" class="form-control" placeholder="Buscar por del usuario o tipo de ingreso" />
                     <button type="submit" class="btn btn-dark">Buscar</button>
                 </div>
                 <br />
@@ -50,6 +56,7 @@
                     <table class="table table-hover mb-0">
                         <thead class="table-dark text-white">
                             <tr>
+                                <th>ID</th>
                                 <th>Usuario</th>
                                 <th>Tipo</th>
                                 <th>Detalle</th>
@@ -63,10 +70,11 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
+                                    <td>@item.ingreso_id</td>
                                     <td>@item.usuario.nombre @item.usuario.apellido</td>
                                     <td>@item.tipo_ingreso</td>
                                     <td>@item.detalle_ingreso</td>
-                                    <td>@item.costo_ingreso.ToString("C")</td>
+                                    <td>@item.costo_ingreso</td>
                                     <td>@item.fecha_ingreso.ToString("dd-MM-yyyy")</td>
                                     <td>@item.fecha_registro_ingreso.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
@@ -92,7 +100,14 @@
 
 <script>
     setTimeout(function () {
-        document.querySelectorAll('.alerta-temporal').forEach(alerta => {
+        document.querySelectorAll('.alerta-temporal.alert-danger').forEach(alerta => {
+            alerta.classList.add('fade-out');
+            setTimeout(() => alerta.style.display = 'none', 500);
+        });
+    }, 5000);
+
+    setTimeout(function () {
+        document.querySelectorAll('.alerta-temporal.alert-success').forEach(alerta => {
             alerta.classList.add('fade-out');
             setTimeout(() => alerta.style.display = 'none', 500);
         });

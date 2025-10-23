@@ -45,6 +45,7 @@ namespace SistemaDeCotizacion.Controllers
                 VehiculoId = cotizacion.cliente.vehiculos.FirstOrDefault()?.vehiculo_id,
                 formaPago = cotizacion.formaPago,
                 tiempoEntrega = cotizacion.tiempoEntrega,
+                trabajador = cotizacion.trabajador,
                 estado_cotizacion = cotizacion.estado_cotizacion,
 
                 ServiciosSeleccionados = cotizacion.servicios.Select(s => new ServicioSeleccionadoVM
@@ -102,7 +103,7 @@ namespace SistemaDeCotizacion.Controllers
             var servicios = vm.ServiciosSeleccionados;
             var repuestos = vm.RepuestosSeleccionados;
 
-            var atendidoPor = "Técnico: Juan Pérez";
+            var atendidoPor = vm.trabajador;
             var formaPago = cotizacion.formaPago;
             var tiempoEntrega = cotizacion.tiempoEntrega + " días";
 

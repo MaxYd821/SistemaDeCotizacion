@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -136,10 +137,20 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public IActionResult ConfirmacionEliminar(int id)
         {
-            var servicio = _appDBContext.Servicios.Find(id);
+            var servicio = _appDBContext.Servicios
+                .Include(s => s.detalle_servicio)
+                .FirstOrDefault(s => s.servicio_id == id);
+
             if (servicio == null)
             {
                 return NotFound();
+            }
+
+            if (servicio.detalle_servicio != null && servicio.detalle_servicio.Any())
+            {
+                TempData["error"] = $"No se puede eliminar el servicio '{servicio.nombre_servicio}' porque hay cotizaciones asignadas. " +
+                                    "Elimina primero a todas las cotizaciones que pertenecen a este servicio.";
+                return RedirectToAction(nameof(Mostrar));
             }
 
             _appDBContext.Servicios.Remove(servicio);

@@ -11,6 +11,7 @@ namespace SistemaDeCotizacion.ViewModels
         public string formaPago { get; set; }
         public string estado_cotizacion { get; set; } = "Pendiente";
         public int tiempoEntrega { get; set; }
+        public string trabajador { get; set; }
 
         // Listas cargadas desde BD
         public List<Cliente> Clientes { get; set; }

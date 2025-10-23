@@ -5,6 +5,12 @@
     Layout = "_Layout";
 }
 
+@if (TempData["error"] != null)
+{
+    <div class="alerta-temporal alert alert-danger text-center">
+        @TempData["error"]
+    </div>
+}
 @if (TempData["mensaje"] != null)
 {
     <div class="alerta-temporal alert alert-success text-center">
@@ -93,7 +99,14 @@
 
 <script>
     setTimeout(function () {
-        document.querySelectorAll('.alerta-temporal').forEach(alerta => {
+        document.querySelectorAll('.alerta-temporal.alert-danger').forEach(alerta => {
+            alerta.classList.add('fade-out');
+            setTimeout(() => alerta.style.display = 'none', 500);
+        });
+    }, 5000);
+
+    setTimeout(function () {
+        document.querySelectorAll('.alerta-temporal.alert-success').forEach(alerta => {
             alerta.classList.add('fade-out');
             setTimeout(() => alerta.style.display = 'none', 500);
         });

@@ -44,7 +44,7 @@ namespace SistemaDeCotizacion.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.usuario_id.ToString()),
-                new Claim(ClaimTypes.Name, usuario.nombre),
+                new Claim(ClaimTypes.Name, usuario.nombre + " " + usuario.apellido),
                 new Claim(ClaimTypes.Email, usuario.correo),
                 new Claim(ClaimTypes.Role, usuario.rol.rol_nombre)
             };
