@@ -106,10 +106,8 @@ namespace SistemaDeCotizacion.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Nuevo(CotizacionVM model)
+        public async Task<IActionResult> Nuevo(CotizacionVM model)
         {
-            using var transaction = _appDBContext.Database.BeginTransaction();
-
             try
             {
                 if (model.ClienteId == null || model.VehiculoId == null)
@@ -133,18 +131,18 @@ namespace SistemaDeCotizacion.Controllers
                 {
                     cliente_id = model.ClienteId,
                     fecha_cotizacion = DateTime.Now,
-                    formaPago = model.formaPago,
+                    formaPago = model.formaPago ?? string.Empty,
                     tiempoEntrega = model.tiempoEntrega,
-                    estado_cotizacion = model.estado_cotizacion,
+                    estado_cotizacion = model.estado_cotizacion ?? "Pendiente",
                     trabajador = trabajador,
                     servicios = new List<DetalleServicio>(),
                     repuestos = new List<DetalleRepuesto>()
                 };
 
                 // Servicios
-                foreach (var serSel in model.ServiciosSeleccionados)
+                foreach (var serSel in model.ServiciosSeleccionados ?? Enumerable.Empty<ServicioSeleccionadoVM>())
                 {
-                    var servicio = _appDBContext.Servicios.Find(serSel.ServicioId);
+                    var servicio = await _appDBContext.Servicios.FindAsync(serSel.ServicioId);
                     if (servicio == null) continue;
 
                     totalServicios += servicio.precio;
@@ -156,9 +154,9 @@ namespace SistemaDeCotizacion.Controllers
                 }
 
                 // Repuestos
-                foreach (var repSel in model.RepuestosSeleccionados)
+                foreach (var repSel in model.RepuestosSeleccionados ?? Enumerable.Empty<RepuestoSeleccionadoVM>())
                 {
-                    var repuesto = _appDBContext.Repuestos.Find(repSel.RepuestoId);
+                    var repuesto = await _appDBContext.Repuestos.FindAsync(repSel.RepuestoId);
                     if (repuesto == null) continue;
 
                     if (repuesto.stock < repSel.Cantidad)
@@ -183,21 +181,21 @@ namespace SistemaDeCotizacion.Controllers
                         cantidad_rep = repSel.Cantidad,
                         valor_venta = valorVenta
                     });
+
+                    _appDBContext.Repuestos.Update(repuesto);
                 }
 
                 cotizacion.costo_servicio_total = totalServicios;
                 cotizacion.costo_repuesto_total = totalRepuestos;
 
-                _appDBContext.Cotizaciones.Add(cotizacion);
-                _appDBContext.SaveChanges();
+                await _appDBContext.Cotizaciones.AddAsync(cotizacion);
+                await _appDBContext.SaveChangesAsync();
 
-                transaction.Commit();
                 TempData["mensaje"] = "Cotización registrada exitosamente.";
                 return RedirectToAction("Mostrar");
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 ViewData["mensaje"] = "Error al registrar la cotización: " + ex.Message;
                 model.Clientes = _appDBContext.Clientes.ToList();
                 model.Vehiculos = _appDBContext.Vehiculos
@@ -264,10 +262,8 @@ namespace SistemaDeCotizacion.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(int id, CotizacionVM model)
+        public async Task<IActionResult> Editar(int id, CotizacionVM model)
         {
-            using var transaction = _appDBContext.Database.BeginTransaction();
-
             try
             {
                 var cotizacion = _appDBContext.Cotizaciones
@@ -367,15 +363,13 @@ namespace SistemaDeCotizacion.Controllers
                 cotizacion.costo_repuesto_total = totalRepuestos;
 
                 _appDBContext.Update(cotizacion);
-                _appDBContext.SaveChanges();
+                await _appDBContext.SaveChangesAsync();
 
-                transaction.Commit();
                 TempData["mensaje"] = "Cotización actualizada exitosamente.";
                 return RedirectToAction("Mostrar");
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 ViewData["mensaje"] = "Error al editar la cotización: " + ex.Message;
                 model.Clientes = _appDBContext.Clientes.ToList();
                 model.Vehiculos = _appDBContext.Vehiculos
