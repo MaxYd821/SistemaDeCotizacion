@@ -19,7 +19,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, int pagina = 1, int registrosPorPagina = 10)
         {
             var query = _appDBContext.Ingresos
                 .Include(i => i.usuario)
@@ -45,12 +45,18 @@ namespace SistemaDeCotizacion.Controllers
                 query = query.Where(i => i.fecha_ingreso.Year == anio.Value);
             }
 
+            var totalRegistros = await query.CountAsync();
+
             var ingresos = await query
                 .OrderByDescending(i => i.fecha_ingreso)
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
                 .ToListAsync();
 
             ViewBag.MesSeleccionado = mes;
             ViewBag.AnioSeleccionado = anio;
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)registrosPorPagina);
 
             ViewBag.Meses = Enumerable.Range(1, 12)
                 .Select(i => new SelectListItem

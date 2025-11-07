@@ -7,6 +7,7 @@ using SistemaDeCotizacion.Models;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Roles = "Administrador")]
     public class RolController : Controller
     {
         private readonly AppDBContext _appDBContext;

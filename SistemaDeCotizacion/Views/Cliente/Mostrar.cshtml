@@ -89,6 +89,24 @@
             }
         </div>
     </div>
+    <br />
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a class="page-link" asp-action="Mostrar"
+                       asp-route-pagina="@i"
+                       asp-route-busqueda="@ViewBag.Busqueda"
+                       asp-route-mes="@ViewBag.MesSeleccionado"
+                       asp-route-anio="@ViewBag.AnioSeleccionado">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+
 </div>
 
 <style>

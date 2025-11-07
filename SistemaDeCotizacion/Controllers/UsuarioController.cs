@@ -9,6 +9,7 @@ using SistemaDeCotizacion.ViewModels;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Roles = "Administrador")]
     public class UsuarioController : Controller
     {
         private readonly AppDBContext _appDBContext;
@@ -18,7 +19,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, int pagina = 1, int registrosPorPagina = 10)
         {
             var query = _appDBContext.Usuarios
                 .Include(u => u.rol)
@@ -44,12 +45,18 @@ namespace SistemaDeCotizacion.Controllers
                 query = query.Where(u => u.fecha_registro.Year == anio.Value);
             }
 
+            var totalRegistros = await query.CountAsync();
+
             var usuarios = await query
                 .OrderByDescending(u => u.fecha_registro)
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
                 .ToListAsync();
 
             ViewBag.MesSeleccionado = mes;
             ViewBag.AnioSeleccionado = anio;
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)registrosPorPagina);
 
             ViewBag.Meses = Enumerable.Range(1, 12)
                 .Select(i => new SelectListItem

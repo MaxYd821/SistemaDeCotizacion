@@ -18,7 +18,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, int pagina = 1, int registrosPorPagina = 10)
         {
             var query = _appDBContext.Repuestos.AsQueryable();
 
@@ -40,12 +40,18 @@ namespace SistemaDeCotizacion.Controllers
                 query = query.Where(r => r.fecha_registro_repuesto.Year == anio.Value);
             }
 
+            var totalRegistros = await query.CountAsync();
+
             var repuestos = await query
                 .OrderByDescending(r => r.fecha_registro_repuesto)
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
                 .ToListAsync();
 
             ViewBag.MesSeleccionado = mes;
             ViewBag.AnioSeleccionado = anio;
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)registrosPorPagina);
 
             ViewBag.Meses = Enumerable.Range(1, 12)
                 .Select(i => new SelectListItem

@@ -20,7 +20,7 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, string estado = null)
+        public async Task<IActionResult> Mostrar(string busqueda = null, int? mes = null, int? anio = null, string estado = null, int pagina = 1, int registrosPorPagina = 10)
         {
             var query = _appDBContext.Cotizaciones
                 .Include(c => c.cliente)
@@ -51,13 +51,19 @@ namespace SistemaDeCotizacion.Controllers
                 query = query.Where(c => c.estado_cotizacion == estado);
             }
 
+            var totalRegistros = await query.CountAsync();
+
             var cotizaciones = await query
                 .OrderByDescending(c => c.fecha_cotizacion)
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
                 .ToListAsync();
 
             ViewBag.MesSeleccionado = mes;
             ViewBag.AnioSeleccionado = anio;
             ViewBag.EstadoSeleccionado = estado;
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)registrosPorPagina);
 
             ViewBag.Meses = Enumerable.Range(1, 12)
                 .Select(i => new SelectListItem
