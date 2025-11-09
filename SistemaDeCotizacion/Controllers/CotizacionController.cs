@@ -101,9 +101,10 @@ namespace SistemaDeCotizacion.Controllers
                 .Where(v => v.cliente_id == clienteId)
                 .Select(v => new
                 {
-                    v.vehiculo_id,
-                    v.placa,
-                    DisplayName = v.marca + " " + v.modelo + " (" + v.placa + ")"
+                    vehiculo_id = v.vehiculo_id,
+                    placa = v.placa,
+                    marca = v.marca,
+                    modelo = v.modelo
                 })
                 .ToList();
 
@@ -260,8 +261,36 @@ namespace SistemaDeCotizacion.Controllers
                 Repuestos = _appDBContext.Repuestos.ToList()
             };
 
-            ViewBag.Clientes = new SelectList(_appDBContext.Clientes, "cliente_id", "nombre_cliente", vm.ClienteId);
-            ViewBag.Vehiculos = new SelectList(_appDBContext.Vehiculos.Where(v => v.cliente_id == vm.ClienteId), "vehiculo_id", "placa", vm.VehiculoId);
+            ViewBag.ClienteId = cotizacion.cliente_id;
+            ViewBag.ClienteNombre = cotizacion.cliente?.nombre_cliente;
+            ViewBag.ClienteRuc = cotizacion.cliente?.ruc;
+
+            ViewBag.Vehiculos = new SelectList(
+                _appDBContext.Vehiculos.Where(v => v.cliente_id == vm.ClienteId),
+                "vehiculo_id",
+                "placa",
+                vm.VehiculoId
+            );
+
+            ViewBag.ServiciosSeleccionados = vm.ServiciosSeleccionados
+                .Select(s => new
+                {
+                    id = s.ServicioId,
+                    text = _appDBContext.Servicios
+                        .Where(x => x.servicio_id == s.ServicioId)
+                        .Select(x => $"{x.nombre_servicio} - S/ {x.precio}")
+                        .FirstOrDefault()
+                }).ToList();
+
+            ViewBag.RepuestosSeleccionados = vm.RepuestosSeleccionados
+                .Select(r => new
+                {
+                    id = r.RepuestoId,
+                    text = _appDBContext.Repuestos
+                        .Where(x => x.repuesto_id == r.RepuestoId)
+                        .Select(x => $"{x.descripcion} COD: {x.codigo_rep} STOCK: {x.stock}")
+                        .FirstOrDefault()
+                }).ToList();
 
             return View(vm);
         }
@@ -294,7 +323,7 @@ namespace SistemaDeCotizacion.Controllers
                     return View(model);
                 }
 
-                // 🧹 Restaurar stock anterior antes de modificar
+                //Restaurar stock anterior antes de modificar
                 foreach (var detRep in cotizacion.repuestos)
                 {
                     var rep = _appDBContext.Repuestos.Find(detRep.repuesto_id);
@@ -304,7 +333,7 @@ namespace SistemaDeCotizacion.Controllers
                     }
                 }
 
-                // 🧹 Eliminar detalles antiguos
+                //Eliminar detalles antiguos
                 _appDBContext.DetalleServicios.RemoveRange(cotizacion.servicios);
                 _appDBContext.DetalleRepuestos.RemoveRange(cotizacion.repuestos);
                 _appDBContext.SaveChanges();
@@ -312,7 +341,7 @@ namespace SistemaDeCotizacion.Controllers
                 double totalServicios = 0;
                 double totalRepuestos = 0;
 
-                // 🔹 Actualizar datos generales
+                //Actualizar datos generales
                 cotizacion.cliente_id = model.ClienteId;
                 cotizacion.formaPago = model.formaPago;
                 cotizacion.tiempoEntrega = model.tiempoEntrega;
@@ -320,7 +349,7 @@ namespace SistemaDeCotizacion.Controllers
                 cotizacion.servicios = new List<DetalleServicio>();
                 cotizacion.repuestos = new List<DetalleRepuesto>();
 
-                // 🔹 Servicios seleccionados
+                //Servicios seleccionados
                 foreach (var serSel in model.ServiciosSeleccionados)
                 {
                     var servicio = _appDBContext.Servicios.Find(serSel.ServicioId);
@@ -334,7 +363,7 @@ namespace SistemaDeCotizacion.Controllers
                     });
                 }
 
-                // 🔹 Repuestos seleccionados
+                //Repuestos seleccionados
                 foreach (var repSel in model.RepuestosSeleccionados)
                 {
                     var repuesto = _appDBContext.Repuestos.Find(repSel.RepuestoId);
@@ -364,7 +393,7 @@ namespace SistemaDeCotizacion.Controllers
                     });
                 }
 
-                // 🔹 Actualizar totales
+                //Actualizar totales
                 cotizacion.costo_servicio_total = totalServicios;
                 cotizacion.costo_repuesto_total = totalRepuestos;
 
@@ -453,5 +482,66 @@ namespace SistemaDeCotizacion.Controllers
             TempData["mensaje"] = "Cotización eliminada con éxito.";
             return RedirectToAction(nameof(Mostrar));
         }
+        //Buscar clientes
+        [HttpGet]
+        public JsonResult BuscarClientes(string term)
+        {
+            var clientes = _appDBContext.Clientes
+                .Where(c => c.nombre_cliente.Contains(term) || c.ruc.Contains(term))
+                .Select(c => new
+                {
+                    id = c.cliente_id,
+                    text = $"{c.nombre_cliente} ({c.ruc})"
+                })
+                .Take(10)
+                .ToList();
+            return Json(clientes);
+        }
+
+        //Buscar servicios
+        [HttpGet]
+        public JsonResult BuscarServicios(string term)
+        {
+            var servicios = _appDBContext.Servicios
+                .Where(s => s.nombre_servicio.Contains(term))
+                .Select(s => new
+                {
+                    id = s.servicio_id,
+                    text = $"{s.nombre_servicio} - S/ {s.precio}"
+                })
+                .Take(10)
+                .ToList();
+
+            return Json(servicios);
+        }
+
+        //Buscar repuestos
+        [HttpGet]
+        public JsonResult BuscarRepuestos(string term)
+        {
+            var lista = _appDBContext.Repuestos
+                .Where(r => string.IsNullOrEmpty(term) || EF.Functions.Like(r.descripcion, $"%{term}%"))
+                .Select(r => new
+                {
+                    id = r.repuesto_id,
+                    descripcion = r.descripcion,
+                    stock = r.stock,
+                    precio = r.precio_und
+                })
+                .ToList() 
+                .Select(r => new
+                {
+                    id = r.id,
+                    text = $"#{r.descripcion} (Stock: {r.stock})",
+                    stock = r.stock,
+                    precio = r.precio
+                })
+                .OrderBy(r => r.text)
+                .Take(10)
+                .ToList();
+
+            return Json(lista);
+        }
+
     }
 }

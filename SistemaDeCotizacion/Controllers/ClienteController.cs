@@ -74,6 +74,7 @@ namespace SistemaDeCotizacion.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Nuevo(Cliente cliente)
         {

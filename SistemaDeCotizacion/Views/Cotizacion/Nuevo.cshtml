@@ -22,10 +22,6 @@
                             <label>Cliente</label>
                             <select id="clienteSelect" asp-for="ClienteId" class="form-select">
                                 <option value="">-- Seleccione un cliente --</option>
-                                @foreach (var c in Model.Clientes)
-                                {
-                                    <option value="@c.cliente_id">@c.nombre_cliente (RUC/DNI: @c.ruc)</option>
-                                }
                             </select>
                         </div>
 
@@ -33,29 +29,15 @@
                             <label>Vehículo</label>
                             <select id="vehiculoSelect" asp-for="VehiculoId" class="form-select">
                                 <option value="">-- Seleccione un vehículo --</option>
-                                @foreach (var v in Model.Vehiculos)
-                                {
-                                    if (v.vehiculo_id == Model.VehiculoId)
-                                    {
-                                        <option value="@v.vehiculo_id" selected> @v.placa (@v.marca - @v.modelo) </option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@v.vehiculo_id"> @v.placa (@v.marca - @v.modelo) </option>
-                                    }
-                                }
                             </select>
+						</div>
 
                         <div class="mb-3">
                             <label>Servicios</label>
                             <div id="serviciosContainer">
                                 <div class="d-flex align-items-center mb-2 servicio-row">
-                                    <select name="ServiciosSeleccionados[0].ServicioId" class="form-select me-2" style="flex: 2">
+                                    <select name="ServiciosSeleccionados[0].ServicioId" class="form-select servicioSelect me-2" style="flex: 2">
                                         <option value="">-- Seleccione un servicio --</option>
-                                        @foreach (var s in Model.Servicios)
-                                        {
-                                            <option value="@s.servicio_id">@s.nombre_servicio - S/. @s.precio</option>
-                                        }
                                     </select>
                                     <button type="button" class="btn btn-outline-secondary ms-2 agregarServicio">+</button>
                                     <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
@@ -67,15 +49,12 @@
                             <label>Repuestos</label>
                             <div id="repuestosContainer">
                                 <div class="d-flex align-items-center mb-2 repuesto-row">
-                                    <select name="RepuestosSeleccionados[0].RepuestoId" class="form-select me-2" style="flex: 2">
+                                    <select name="RepuestosSeleccionados[0].RepuestoId" class="form-select repuestoSelect me-2" style="flex: 2">
                                         <option value="">-- Seleccione un repuesto --</option>
-                                        @foreach (var r in Model.Repuestos)
-                                        {
-                                            <option value="@r.repuesto_id">@r.descripcion (Stock: @r.stock)</option>
-                                        }
                                     </select>
                                     <input name="RepuestosSeleccionados[0].Cantidad" type="number" class="form-control" style="width:100px" min="1" placeholder="Cant." />
                                     <button type="button" class="btn btn-outline-secondary ms-2 agregarRepuesto">+</button>
+                                        <button type="button" class="btn btn-outline-danger ms-2 eliminarFila">🗑</button>
                                 </div>
                             </div>
                         </div>
@@ -109,59 +88,166 @@
     </div>
 </div>
 
-<script>
-    // Cargar vehículos según cliente seleccionado
-    document.getElementById('clienteSelect').addEventListener('change', function () {
-        var clienteId = this.value;
-        var vehiculoSelect = document.getElementById('vehiculoSelect');
-        vehiculoSelect.innerHTML = '';
+@section Scripts {
+    <script>
 
-        if (clienteId) {
-            fetch(`/Cotizacion/ObtenerVehiculosPorCliente?clienteId=${clienteId}`)
-                .then(r => r.json())
-                .then(data => {
-                    vehiculoSelect.innerHTML = '<option value="">-- Seleccione un vehículo --</option>';
-                    data.forEach(v => {
-                        vehiculoSelect.innerHTML += `<option value="${v.vehiculo_id}">${v.placa}</option>`;
-                    });
+        $(document).ready(function () {
+            function inicializarSelect2Servicios() {
+                $('.servicioSelect').select2({
+                    placeholder: "-- Seleccione un servicio --",
+                    allowClear: true,
+                    ajax: {
+                        url: '/Cotizacion/BuscarServicios',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return { term: params.term };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data
+                            };
+                        }
+                    }
                 });
-        }
-    });
+            }
 
-    // Agregar nuevas filas de repuestos
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('agregarRepuesto')) {
-            const container = document.getElementById('repuestosContainer');
-            const rows = container.querySelectorAll('.repuesto-row');
-            const newIndex = rows.length;
+            // Inicializar en la carga inicial
+            inicializarSelect2Servicios();
 
-            const nuevaFila = rows[0].cloneNode(true);
-            nuevaFila.querySelector('select').name = `RepuestosSeleccionados[${newIndex}].RepuestoId`;
-            nuevaFila.querySelector('input').name = `RepuestosSeleccionados[${newIndex}].Cantidad`;
-            nuevaFila.querySelector('input').value = '';
-            container.appendChild(nuevaFila);
-        }
-    });
+            // Al agregar nueva fila de servicio
+            $(document).on('click', '.agregarServicio', function () {
+                const container = $('#serviciosContainer');
+                const rows = container.find('.servicio-row');
+                const newIndex = rows.length;
 
-    // Agregar nuevas filas de servicios
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('agregarServicio')) {
-            const container = document.getElementById('serviciosContainer');
-            const rows = container.querySelectorAll('.servicio-row');
-            const newIndex = rows.length;
+                const nuevaFila = rows.first().clone();
 
-            const nuevaFila = rows[0].cloneNode(true);
-            nuevaFila.querySelector('select').name = `ServiciosSeleccionados[${newIndex}].ServicioId`;
-            nuevaFila.querySelector('select').selectedIndex = 0;
-            container.appendChild(nuevaFila);
-        }
-    });
+                // Actualizar nombres e IDs
+                nuevaFila.find('select')
+                    .attr('name', `ServiciosSeleccionados[${newIndex}].ServicioId`)
+                    .val(null)
+                    .off('select2') // Evita conflicto
+                    .removeAttr('data-select2-id')
+                    .removeClass('select2-hidden-accessible')
+                    .next('.select2').remove();
 
-        // Eliminar fila dinámica
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('eliminarFila')) {
-            const row = e.target.closest('.servicio-row, .repuesto-row');
-            if (row) row.remove();
-        }
-    });
-</script>
+                container.append(nuevaFila);
+
+                // Re-inicializar Select2 en la nueva fila
+                inicializarSelect2Servicios();
+            });
+
+            // Eliminar fila de servicio
+            $(document).on('click', '.eliminarFila', function () {
+                const row = $(this).closest('.servicio-row');
+                if ($('#serviciosContainer .servicio-row').length > 1) {
+                    row.remove();
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Inicializar Select2 para cliente con AJAX
+            $('#clienteSelect').select2({
+                placeholder: "-- Seleccione un cliente --",
+                allowClear: true,
+                ajax: {
+                    url: '/Cotizacion/BuscarClientes',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(c => ({
+                                id: c.id,
+                                text: c.text
+                            }))
+                        };
+                    }
+                }
+            });
+
+            // Cuando cambia el cliente, actualizar vehículos
+            $('#clienteSelect').on('change', function () {
+                const clienteId = $(this).val();
+                const vehiculoSelect = $('#vehiculoSelect');
+                vehiculoSelect.empty();
+
+                if (clienteId) {
+                    fetch(`/Cotizacion/ObtenerVehiculosPorCliente?clienteId=${clienteId}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            vehiculoSelect.append('<option value="">-- Seleccione un vehículo --</option>');
+                            data.forEach(v => {
+                                vehiculoSelect.append(`<option value="${v.vehiculo_id}">${v.placa} (${v.marca} - ${v.modelo})</option>`);
+                            });
+                        });
+                }
+            });
+        });
+
+        $(document).ready(function () {
+
+            // Función para inicializar Select2 en repuestos
+            function inicializarSelect2Repuestos() {
+                $('.repuestoSelect').select2({
+                    placeholder: "-- Seleccione un repuesto --",
+                    allowClear: true,
+                    ajax: {
+                        url: '/Cotizacion/BuscarRepuestos',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return { term: params.term };
+                        },
+                        processResults: function (data) {
+                            return { results: data };
+                        }
+                    }
+                });
+            }
+
+            // Inicializar el primero
+            inicializarSelect2Repuestos();
+
+            // Agregar nueva fila de repuesto
+            $(document).on('click', '.agregarRepuesto', function () {
+                const container = $('#repuestosContainer');
+                const rows = container.find('.repuesto-row');
+                const newIndex = rows.length;
+
+                const nuevaFila = rows.first().clone();
+
+                // Actualizar nombres e IDs
+                nuevaFila.find('select')
+                    .attr('name', `RepuestosSeleccionados[${newIndex}].RepuestoId`)
+                    .val(null)
+                    .off('select2') // Elimina cualquier instancia previa
+                    .removeAttr('data-select2-id')
+                    .removeClass('select2-hidden-accessible')
+                    .next('.select2').remove();
+
+                nuevaFila.find('input[type="number"]')
+                    .attr('name', `RepuestosSeleccionados[${newIndex}].Cantidad`)
+                    .val(1);
+
+                container.append(nuevaFila);
+
+                // Re-inicializar Select2 para el nuevo campo
+                inicializarSelect2Repuestos();
+            });
+
+            // Eliminar fila de repuesto
+            $(document).on('click', '.eliminarFila', function () {
+                const row = $(this).closest('.repuesto-row');
+                if ($('#repuestosContainer .repuesto-row').length > 1) {
+                    row.remove();
+                }
+            });
+        });
+
+    </script>
+}

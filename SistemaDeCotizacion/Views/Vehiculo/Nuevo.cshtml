@@ -31,14 +31,10 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="cliente_id" class="form-label fw-semibold">Cliente</label>
-                                <select asp-for="cliente_id" class="form-select" required>
-                                    <option value="">Selecciona un cliente</option>
-                                    @foreach (var cliente in ViewBag.Clientes as List<SistemaDeCotizacion.Models.Cliente>)
-                                    {
-                                        <option value="@cliente.cliente_id">@cliente.nombre_cliente</option>
-                                    }
-                                </select>
+                                <label for="clienteInput" class="form-label fw-semibold">Cliente</label>
+                                <input type="text" id="clienteInput" class="form-control" placeholder="Buscar cliente por nombre o RUC" autocomplete="off" required />
+                                <input type="hidden" id="cliente_id" name="cliente_id" />
+                                <div id="clienteResultados" class="list-group mt-1"></div>
                                 <span asp-validation-for="cliente_id" class="text-danger"></span>
                             </div>
 
@@ -74,4 +70,34 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $("#clienteInput").on("input", function () {
+                var term = $(this).val();
+                if (term.length < 2) {
+                    $("#clienteResultados").empty();
+                    return;
+                }
+
+                $.getJSON("/Vehiculo/BuscarClientes", { term: term }, function (data) {
+                    var resultados = "";
+                    data.forEach(function (c) {
+                        resultados += `<a href="#" class="list-group-item list-group-item-action cliente-item" data-id="${c.cliente_id}">${c.nombre_cliente}</a>`;
+                    });
+                    $("#clienteResultados").html(resultados);
+                });
+            });
+
+            // Cuando el usuario selecciona un cliente
+            $(document).on("click", ".cliente-item", function (e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+                var nombre = $(this).text();
+
+                $("#cliente_id").val(id);
+                $("#clienteInput").val(nombre);
+                $("#clienteResultados").empty();
+            });
+        });
+    </script>
 }

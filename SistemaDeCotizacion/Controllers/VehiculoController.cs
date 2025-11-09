@@ -80,6 +80,25 @@ namespace SistemaDeCotizacion.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BuscarClientes(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
+
+            var clientes = await _appDBContext.Clientes
+                .Where(c => c.nombre_cliente.Contains(term) || c.ruc.Contains(term))
+                .Select(c => new
+                {
+                    c.cliente_id,
+                    c.nombre_cliente
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Json(clientes);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Nuevo(Vehiculo vehiculo)
         {
@@ -104,7 +123,10 @@ namespace SistemaDeCotizacion.Controllers
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
-            var vehiculo = await _appDBContext.Vehiculos.FindAsync(id);
+            var vehiculo = await _appDBContext.Vehiculos
+                .Include(v => v.cliente)
+                .FirstOrDefaultAsync(v => v.vehiculo_id == id);
+
             if (vehiculo == null)
                 return NotFound();
 
