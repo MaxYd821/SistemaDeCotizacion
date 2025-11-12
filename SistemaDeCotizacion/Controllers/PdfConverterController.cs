@@ -6,9 +6,6 @@ using QuestPDF.Infrastructure;
 using SistemaDeCotizacion.Data;
 using SistemaDeCotizacion.Models;
 using SistemaDeCotizacion.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -22,6 +19,50 @@ namespace SistemaDeCotizacion.Controllers
             _appDBContext = appDBContext;
         }
 
+        public static string ConvertirNumeroEnLetras(double numero)
+        {
+            long parteEntera = (long)Math.Truncate(numero);
+            int parteDecimal = (int)Math.Round((numero - parteEntera) * 100);
+
+            string textoEntero = NumeroALetras(parteEntera).ToUpper();
+            string textoDecimal = parteDecimal.ToString("00");
+
+            return $"{textoEntero} CON {textoDecimal}/100";
+        }
+
+        private static string NumeroALetras(long value)
+        {
+            if (value == 0) return "cero";
+
+            string[] unidades = { "", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
+                          "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve" };
+            string[] decenas = { "", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa" };
+            string[] centenas = { "", "cien", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos",
+                          "setecientos", "ochocientos", "novecientos" };
+
+            if (value < 20) return unidades[value];
+            if (value < 100)
+                return decenas[value / 10] + ((value % 10 > 0) ? " y " + unidades[value % 10] : "");
+            if (value < 1000)
+                return (value == 100 ? "cien" : centenas[value / 100] + ((value % 100 > 0) ? " " + NumeroALetras(value % 100) : ""));
+            if (value < 1000000)
+            {
+                long miles = value / 1000;
+                long resto = value % 1000;
+                string milesTexto = (miles == 1) ? "mil" : NumeroALetras(miles) + " mil";
+                return milesTexto + ((resto > 0) ? " " + NumeroALetras(resto) : "");
+            }
+            if (value < 1000000000000)
+            {
+                long millones = value / 1000000;
+                long resto = value % 1000000;
+                string millonesTexto = (millones == 1) ? "un millón" : NumeroALetras(millones) + " millones";
+                return millonesTexto + ((resto > 0) ? " " + NumeroALetras(resto) : "");
+            }
+
+            return "";
+        }
+
         [HttpGet]
         public IActionResult GenerarPDFCotizacion(int id)
         {
@@ -33,10 +74,9 @@ namespace SistemaDeCotizacion.Controllers
                 .Include(c => c.repuestos)
                     .ThenInclude(dr => dr.repuesto)
                 .FirstOrDefault(c => c.cotizacion_id == id);
+
             if (cotizacion == null)
-            {
                 return NotFound();
-            }
 
             var vm = new CotizacionVM
             {
@@ -66,9 +106,7 @@ namespace SistemaDeCotizacion.Controllers
                 }).ToList(),
 
                 Clientes = _appDBContext.Clientes.ToList(),
-                Vehiculos = _appDBContext.Vehiculos
-                    .Where(v => v.cliente_id == cotizacion.cliente_id)
-                    .ToList(),
+                Vehiculos = _appDBContext.Vehiculos.Where(v => v.cliente_id == cotizacion.cliente_id).ToList(),
                 Servicios = _appDBContext.Servicios.ToList(),
                 Repuestos = _appDBContext.Repuestos.ToList()
             };
@@ -76,12 +114,11 @@ namespace SistemaDeCotizacion.Controllers
             var empresaDireccion = "PROLONGACION AV. RICARDO PALMA URB. EL BOSQUE 1397";
             var empresaCorreo = "todocamioneseirl@gmail.com";
             var empresaTelefono = "949280381";
-            var empresaCta = "CTA CTE BCP: 570-9943050-0-22";
-            var empresaCCI = "CCI BCP: 002-57000994305002205";
+            var empresaCta = "570-9943050-0-22";
+            var empresaCCI = "002-57000994305002205";
 
             int numeroBase = 2749;
-            int id_sum = cotizacion.cotizacion_id;
-            int resultado = id_sum + numeroBase;
+            int resultado = cotizacion.cotizacion_id + numeroBase;
             string cotizacionNumero = $"000-{resultado:D7}";
 
             var cotizacionFecha = cotizacion.fecha_cotizacion;
@@ -91,10 +128,7 @@ namespace SistemaDeCotizacion.Controllers
             var clienteCorreo = cotizacion.cliente.correo_cliente ?? "N/A";
             var clienteTelefono = cotizacion.cliente.telefono_cliente ?? "N/A";
 
-            var vehiculo = _appDBContext.Vehiculos
-                .FirstOrDefault(v => v.cliente_id == cotizacion.cliente_id);
-
-
+            var vehiculo = _appDBContext.Vehiculos.FirstOrDefault(v => v.cliente_id == cotizacion.cliente_id);
             var placa = vehiculo?.placa ?? "N/A";
             var modelo = vehiculo?.modelo ?? "N/A";
             var marca = vehiculo?.marca ?? "N/A";
@@ -107,128 +141,101 @@ namespace SistemaDeCotizacion.Controllers
             var formaPago = cotizacion.formaPago;
             var tiempoEntrega = cotizacion.tiempoEntrega + " días";
 
-            Double subtotalServicios = cotizacion.costo_servicio_total;
-            Double subtotalRepuestos = cotizacion.costo_repuesto_total;
-            Double subtotal = subtotalServicios + subtotalRepuestos;
-            Double total = subtotal;
+            double subtotalServicios = cotizacion.costo_servicio_total;
+            double subtotalRepuestos = cotizacion.costo_repuesto_total;
+            double total = subtotalServicios + subtotalRepuestos;
+            string totalEnLetras = ConvertirNumeroEnLetras(total);
 
             var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "Logo.png");
             var logoExists = System.IO.File.Exists(logoPath);
 
-            // ----------------------------
-            // Crear documento con QuestPDF
-            // ----------------------------
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(30);
-                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Times New Roman"));
+                    page.Margin(30); // más compacto
+                    page.DefaultTextStyle(x => x.FontSize(8.5f).FontFamily("Times New Roman"));
                     page.PageColor(Colors.White);
 
-                    // ---------- HEADER ----------
-                    page.Header()
-                        .PaddingBottom(6)
-                        .Row(r =>
+                    // HEADER
+                    page.Header().PaddingBottom(3).Row(r =>
+                    {
+                        r.ConstantColumn(260).Element(left =>
                         {
-                            // Logo (izquierda)
-                            r.ConstantColumn(300).Element(left =>
+                            left.Element(c =>
                             {
-                                left.Element(c =>
+                                if (logoExists)
                                 {
-                                    if (logoExists)
-                                    {
-                                        using var fs = System.IO.File.OpenRead(logoPath);
-                                        c.Image(fs, ImageScaling.FitWidth);
-                                    }
-                                    else
-                                    {
-                                        c.PaddingVertical(20).AlignCenter().Text("LOGO").FontSize(14).Bold();
-                                    }
-                                });
-                            });
-
-                            r.RelativeColumn().Element(_ => { /* espacio */ });
-
-                            // Cuadro de cotización (derecha)
-                            r.ConstantColumn(230).Element(right =>
-                            {
-                                right.AlignRight().Border(1.5f).BorderColor("#B71C1C").Background("#FFEBEE").Padding(8).Column(col =>
+                                    using var fs = System.IO.File.OpenRead(logoPath);
+                                    c.Image(fs, ImageScaling.FitWidth);
+                                }
+                                else
                                 {
-                                    col.Item().AlignCenter().Text("COTIZACIÓN")
-                                        .FontColor("#B71C1C")
-                                        .FontSize(13)
-                                        .Bold();
-
-                                    col.Item().PaddingTop(2).AlignCenter().Text($"N° {cotizacionNumero}")
-                                        .FontColor("#B71C1C")
-                                        .FontSize(11)
-                                        .Bold();
-
-                                    col.Item().PaddingTop(2).AlignCenter().Text($"Fecha: {cotizacionFecha}")
-                                        .FontColor(Colors.Black)
-                                        .FontSize(10);
-                                });
+                                    c.PaddingVertical(10).AlignCenter().Text("LOGO").FontSize(20).Bold();
+                                }
                             });
                         });
 
-                    // ---------- CONTENT ----------
+                        r.RelativeColumn();
+
+                        r.ConstantColumn(200).Element(right =>
+                        {
+                            right.AlignRight()
+                                .Border(1)
+                                .BorderColor("#000000")
+                                .Background("#FFFFFF")
+                                .Padding(4)
+                                .Column(col =>
+                                {
+                                    col.Item().AlignCenter().Text("20610683151").FontColor("#000000").FontSize(15).Bold();
+                                    col.Item().AlignCenter().Text("COTIZACIÓN").FontColor("#000000").FontSize(16).Bold();
+                                    col.Item().AlignCenter().Text($"N° {cotizacionNumero}").FontColor("#000000").FontSize(16).Bold();
+                                    col.Item().AlignCenter()
+                                       .Text($"Fecha: {cotizacionFecha:dd/MM/yyyy hh:mm tt}")
+                                       .FontColor(Colors.Black)
+                                       .FontSize(8);
+
+
+                                });
+                        });
+                    });
+
+                    // CONTENT
                     page.Content().Column(col =>
                     {
-                        // ===== EMPRESA: tabla con celdas individuales (como en tu imagen) =====
-                        col.Item().PaddingBottom(6).Element(c =>
+                        // EMPRESA
+                        col.Item().PaddingBottom(3).Element(c =>
                         {
                             c.Table(table =>
                             {
-                                // 4 columnas: label-left, value-left (span wide), label-right, value-right
                                 table.ColumnsDefinition(cols =>
                                 {
-                                    cols.ConstantColumn(80);   // etiqueta izquierda
-                                    cols.RelativeColumn(5);   // valor izquierda
-                                    cols.ConstantColumn(80);  // etiqueta derecha
-                                    cols.RelativeColumn(4);   // valor derecha
+                                    cols.ConstantColumn(70);
+                                    cols.RelativeColumn(5);
+                                    cols.ConstantColumn(70);
+                                    cols.RelativeColumn(4);
                                 });
 
-                                // Fila 1: DIRECCIÓN / TELEFONO
-                                // Fila DIRECCIÓN (etiqueta + valor unidos, sin celdas vacías extra)
-                                table.Cell().Element(cell => cell
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("DIRECCIÓN:")
-                                    .Bold()
-                                );
+                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("DIRECCIÓN:").Bold());
+                                table.Cell().ColumnSpan(3).Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(empresaDireccion).Bold());
 
-                                // 🔹 Esta celda se une con las dos columnas restantes (3 y 4)
-                                table.Cell().ColumnSpan(3).Element(cell => cell
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(empresaDireccion)
-                                );
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("CORREO:").Bold());
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(empresaCorreo).FontColor("#007BFF"));
 
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("CTA CTE BCP:").Bold());
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(empresaCta));
 
-                                // Fila 2: CORREO / CTA CTE BCP
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("CORREO:").Bold());
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(empresaCorreo));
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("CTA CTE BCP:").Bold());
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(empresaCta));
-
-                                // Fila 3: empty label / CCI BCP on right (keeps table shape similar to your sample)
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("TELEFONO:").Bold());
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(empresaTelefono));
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("CCI BCP:").Bold());
-                                table.Cell().Element(cell => cell.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(empresaCCI));
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("TELÉFONO:").Bold());
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(empresaTelefono));
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("CCI BCP:").Bold());
+                                table.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(empresaCCI));
                             });
                         });
 
-                        // Texto introductorio
-                        col.Item().PaddingBottom(6).Text("Mediante la presente cotizamos su requerimiento como sigue a continuación:").FontSize(10);
+                        col.Item().PaddingBottom(3).Text("Mediante la presente cotizamos su requerimiento como sigue a continuación:").FontSize(8.5f);
 
-                        // ===== DATOS DEL CLIENTE Y VEHÍCULO: ambos en tablas con celdas bordeadas =====
-                        // ===== DATOS DEL CLIENTE =====
+                        // DATOS DEL CLIENTE
                         col.Item().Element(container =>
                         {
                             container.Table(tbl =>
@@ -241,73 +248,26 @@ namespace SistemaDeCotizacion.Controllers
                                     cd.RelativeColumn(2);
                                 });
 
-                                // Encabezado
-                                tbl.Cell().ColumnSpan(4).Element(h => h
-                                    .Background("#4F4F4F")
-                                    .Padding(6)
-                                    .Text("DATOS DEL CLIENTE")
-                                    .FontColor(Colors.White)
-                                    .Bold());
+                                tbl.Cell().ColumnSpan(4).Element(h => h.BorderColor(Colors.Black)
+                                            .Background(Colors.Black).Padding(3).Text("DATOS DEL CLIENTE").FontColor(Colors.White).Bold().AlignCenter());
 
-                                // Fila 2: Nombre/Razón Social y RUC
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("NOMBRE / RAZÓN SOCIAL:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(clienteNombre));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("NOMBRE / RAZÓN SOCIAL:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(clienteNombre));
 
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("RUC:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(clienteRUC));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("RUC:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(clienteRUC));
 
-                                // Fila 3: Correo y Teléfono
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("CORREO:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(clienteCorreo));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("CORREO:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(clienteCorreo));
 
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("TELÉFONO:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(clienteTelefono));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("TELÉFONO:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(clienteTelefono));
                             });
                         });
 
-                        col.Item().PaddingTop(10);
+                        col.Item().PaddingTop(3);
 
-                        // ===== DATOS DEL VEHÍCULO =====
+                        // DATOS DEL VEHÍCULO
                         col.Item().Element(container =>
                         {
                             container.Table(tbl =>
@@ -320,196 +280,231 @@ namespace SistemaDeCotizacion.Controllers
                                     cd.RelativeColumn(2);
                                 });
 
-                                // Encabezado
-                                tbl.Cell().ColumnSpan(4).Element(h => h
-                                    .Background("#4F4F4F")
-                                    .Padding(6)
-                                    .Text("DATOS DEL VEHÍCULO")
-                                    .FontColor(Colors.White)
-                                    .Bold());
+                                tbl.Cell().ColumnSpan(4).Element(h => h.BorderColor(Colors.Black)
+                                            .Background(Colors.Black).Padding(3).Text("DATOS DEL VEHÍCULO").FontColor(Colors.White).Bold().AlignCenter());
 
-                                // Fila 2: Placa y Modelo
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("PLACA:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(placa));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("PLACA:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(placa));
 
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("MODELO:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(modelo));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("MODELO:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(modelo));
 
-                                // Fila 3: Marca y KM
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("MARCA:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(marca));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("MARCA:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(marca));
 
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#D9D9D9")
-                                    .Padding(6)
-                                    .Text("KM:")
-                                    .Bold());
-                                tbl.Cell().Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Padding(6)
-                                    .Text(km));
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("KM:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(km));
                             });
                         });
 
-                        col.Item().PaddingTop(8);
+                        col.Item().PaddingTop(3);
 
-                        // ===== SERVICIOS - tabla con celdas bordeadas =====
+                        // SERVICIOS
                         col.Item().Element(tcont =>
                         {
                             tcont.Table(tbl =>
                             {
-                                tbl.ColumnsDefinition(cd => { cd.ConstantColumn(30); cd.RelativeColumn(7); cd.ConstantColumn(80); });
+                                tbl.ColumnsDefinition(cd => { cd.ConstantColumn(25); cd.RelativeColumn(7); cd.ConstantColumn(70); });
 
-                                // Header row (span full)
-                                tbl.Cell().ColumnSpan(3).Element(h => h.Background("#4F4F4F").Padding(6).Text("SERVICIOS A REALIZAR").FontColor(Colors.White).Bold());
+                                tbl.Cell().ColumnSpan(3).Element(h => h.BorderColor(Colors.Black)
+                                            .Background(Colors.Black).Padding(3).Text("SERVICIOS A REALIZAR").FontColor(Colors.White).Bold().AlignCenter());
 
-                                // Column titles
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("N°").Bold().AlignCenter());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("DESCRIPCIÓN").Bold().AlignCenter());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text("COSTO DEL SERVICIO S/").Bold().AlignCenter());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("N°").Bold().AlignCenter());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("DESCRIPCIÓN").Bold().AlignCenter());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text("COSTO").Bold().AlignCenter());
 
                                 int i = 1;
                                 foreach (var s in servicios)
                                 {
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignCenter().Text(i.ToString()));
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(s.nombre_servicio));
-                                    var precio = s.precio > 0 ? $"S/ {s.precio:N2}" : "";
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignRight().Text(precio));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignCenter().Text(i.ToString()));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(s.nombre_servicio));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignRight().Text($"S/ {s.precio:N2}"));
                                     i++;
                                 }
 
-                                // total servicios row
-                                tbl.Cell().ColumnSpan(2).Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Background("#F3F3F3").AlignRight().Text("TOTAL SERVICIOS:").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Background("#F3F3F3").AlignRight().Text($"S/ {subtotalServicios:N2}").Bold());
+                                tbl.Cell().ColumnSpan(2).Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Background("#F3F3F3").AlignRight().Text("TOTAL SERVICIOS:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Background("#F3F3F3").AlignRight().Text($"S/ {subtotalServicios:N2}").Bold());
                             });
                         });
 
-                        col.Item().PaddingTop(6);
+                        col.Item().PaddingTop(3);
 
-                        // ===== REPUESTOS - tabla con celdas bordeadas =====
+                        // REPUESTOS
                         col.Item().Element(tcont =>
                         {
                             tcont.Table(tbl =>
                             {
-                                tbl.ColumnsDefinition(cd => { cd.RelativeColumn(1); cd.ConstantColumn(50); cd.ConstantColumn(50); cd.RelativeColumn(4); cd.ConstantColumn(70); cd.ConstantColumn(70); });
+                                tbl.ColumnsDefinition(cd =>
+                                {
+                                    cd.RelativeColumn(1);
+                                    cd.ConstantColumn(40);
+                                    cd.ConstantColumn(40);
+                                    cd.RelativeColumn(4);
+                                    cd.ConstantColumn(60);
+                                    cd.ConstantColumn(60);
+                                });
 
-                                tbl.Cell().ColumnSpan(6).Element(h => h.Background("#4F4F4F").Padding(6).Text("REPUESTOS Y MATERIALES").FontColor(Colors.White).Bold());
+                                tbl.Cell().ColumnSpan(6).Element(h => h.BorderColor(Colors.Black)
+                                            .Background(Colors.Black).Padding(3).Text("REPUESTOS Y MATERIALES").FontColor(Colors.White).Bold().AlignCenter());
 
-                                // headers
-                                var headers = new[] { "CÓDIGO", "CANT.", "MEDIDA", "DESCRIPCIÓN", "P. UNIT.", "VALOR VENTA" };
+                                var headers = new[] { "CÓDIGO", "CANT.", "MEDIDA", "DESCRIPCIÓN", "P. UNIT.", "VALOR" };
                                 foreach (var head in headers)
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).Text(head).Bold().AlignCenter());
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(3).Text(head).Bold().AlignCenter());
 
                                 foreach (var ritem in repuestos)
                                 {
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignCenter().Text(ritem.codigo_rep));
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignCenter().Text(ritem.Cantidad.ToString()));
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignCenter().Text(ritem.medida_rep));
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(ritem.descripcion));
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignRight().Text($"S/ {ritem.precio_und:N2}"));
-                                    var valor = subtotalRepuestos;
-                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignRight().Text($"S/ {valor:N2}"));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignCenter().Text(ritem.codigo_rep));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignCenter().Text(ritem.Cantidad.ToString()));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignCenter().Text(ritem.medida_rep));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Text(ritem.descripcion));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignRight().Text($"S/ {ritem.precio_und:N2}"));
+                                    tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).AlignRight().Text($"S/ {(ritem.Cantidad * ritem.precio_und):N2}"));
                                 }
 
-                                // total repuestos
-                                tbl.Cell().ColumnSpan(5).Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Background("#F3F3F3").AlignRight().Text("TOTAL REPUESTOS:").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Background("#F3F3F3").AlignRight().Text($"S/ {subtotalRepuestos:N2}").Bold());
+                                tbl.Cell().ColumnSpan(5).Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Background("#F3F3F3").AlignRight().Text("TOTAL REPUESTOS:").Bold());
+                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(3).Background("#F3F3F3").AlignRight().Text($"S/ {subtotalRepuestos:N2}").Bold());
                             });
                         });
 
-                        col.Item().PaddingTop(8);
+                        col.Item().PaddingTop(3);
+                        // Salto antes
+                        col.Item().PaddingTop(6);
 
-                        // ===== TOTALES (solo importe total) =====
-                        col.Item().Element(totalBox =>
+                        // Texto simple, fuera de tabla (NO usa Element)
+                        col.Item().Text($"SON: {totalEnLetras} N.S")
+                            .Bold()
+                            .FontSize(8.5f);
+
+                        // Salto después
+                        col.Item().PaddingBottom(6);
+
+
+                        col.Item().PaddingTop(3);
+
+
+                        col.Item().PaddingTop(2).Element(section =>
                         {
-                            totalBox.Table(tbl =>
+                            section.Row(row =>
                             {
-                                tbl.ColumnsDefinition(cd => { cd.RelativeColumn(6); cd.ConstantColumn(140); });
 
-                                // Left big cell for "SON: ..." (two rows)
-                                tbl.Cell().Row(1).Column(1).RowSpan(2).Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text("_____________________________________________").FontSize(9));
-
-                                // Label Importe total
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Background("#D9D9D9").Padding(6).AlignRight().Text("IMPORTE TOTAL").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).AlignRight().Text($"S/ {total:N2}").Bold());
-                            });
-                        });
-
-                        col.Item().PaddingTop(8);
-
-                        // ===== ATENCIÓN / CONDICIONES =====
-                        col.Item().Element(at =>
-                        {
-                            at.Table(tbl =>
-                            {
-                                tbl.ColumnsDefinition(cd =>
+                                row.ConstantColumn(280).Element(at =>
                                 {
-                                    cd.ConstantColumn(120); // primera columna
-                                    cd.RelativeColumn(4);   // segunda columna
+                                    at.Table(tbl =>
+                                    {
+                                        tbl.ColumnsDefinition(cd =>
+                                        {
+                                            cd.ConstantColumn(90);   // etiquetas más compactas
+                                            cd.RelativeColumn(2);   // contenido más estrecho
+                                        });
+
+                                        // HEADER
+                                        tbl.Cell().ColumnSpan(2).Element(c => c
+                                            .Border(0.8f)
+                                            .BorderColor(Colors.Black)
+                                            .Background(Colors.Black)
+                                            .Padding(3)
+                                            .AlignCenter()
+                                            .Text("ATENCIÓN / CONDICIONES")
+                                            .FontColor(Colors.White)
+                                            .Bold()
+                                        );
+
+                                        // Fila 1
+                                        tbl.Cell().Element(c =>
+                                            c.Background("#D9D9D9")
+                                             .Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text("Atendido por:")
+                                             .Bold()
+                                        );
+                                        tbl.Cell().Element(c =>
+                                            c.Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text(atendidoPor)
+                                        );
+
+                                        // Fila 2
+                                        tbl.Cell().Element(c =>
+                                            c.Background("#D9D9D9")
+                                             .Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text("Forma de pago:")
+                                             .Bold()
+                                        );
+                                        tbl.Cell().Element(c =>
+                                            c.Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text(formaPago)
+                                        );
+
+                                        // Fila 3
+                                        tbl.Cell().Element(c =>
+                                            c.Background("#D9D9D9")
+                                             .Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text("Tiempo de entrega:")
+                                             .Bold()
+                                        );
+                                        tbl.Cell().Element(c =>
+                                            c.Border(0.8f)
+                                             .BorderColor(Colors.Grey.Darken2)
+                                             .Padding(3)
+                                             .Text(tiempoEntrega)
+                                        );
+                                    });
                                 });
 
-                                // 🔹 Subtítulo: una sola celda que abarca ambas columnas
-                                tbl.Cell().ColumnSpan(2).Element(c => c
-                                    .Border(0.8f)
-                                    .BorderColor(Colors.Grey.Darken2)
-                                    .Background("#4F4F4F")
-                                    .Padding(6)
-                                    .Text("ATENCIÓN / CONDICIONES")
-                                    .FontColor(Colors.White)
-                                    .Bold()
-                                    .AlignCenter()
-                                );
 
-                                // Fila 1
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text("Atendido por:").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(atendidoPor));
+                                row.RelativeColumn(0.5f);
 
-                                // Fila 2
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text("Forma de pago:").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(formaPago));
 
-                                // Fila 3
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text("Tiempo de entrega:").Bold());
-                                tbl.Cell().Element(c => c.Border(0.8f).BorderColor(Colors.Grey.Darken2).Padding(6).Text(tiempoEntrega));
+                                row.ConstantColumn(200).Element(right =>
+                                {
+                                    right.PaddingLeft(4).Element(box =>
+                                    {
+                                        box.Table(tbl =>
+                                        {
+                                            tbl.ColumnsDefinition(cd =>
+                                            {
+                                                cd.RelativeColumn(1);  // titulo
+                                                cd.RelativeColumn(1);  // precio
+                                            });
+
+                                            // TÍTULO (NEGRO, TEXTO BLANCO)
+                                            tbl.Cell().Element(c => c
+                                                .Border(0.8f)
+                                                .BorderColor(Colors.Black)
+                                                .Background(Colors.Black)
+                                                .Padding(4)
+                                                .AlignCenter()
+                                                .Text("IMPORTE TOTAL")
+                                                .FontColor(Colors.White)
+                                                .Bold()
+                                            );
+
+                                            // PRECIO (DERECHA)
+                                            tbl.Cell().Element(c => c
+                                                .Border(0.8f)
+                                                .BorderColor(Colors.Grey.Darken2)
+                                                .Padding(4)
+                                                .AlignRight()
+                                                .Text($"S/ {total:N2}")
+                                                .Bold()
+                                            );
+                                        });
+                                    });
+                                });
                             });
                         });
 
-
-                        col.Item().AlignCenter().Text("\n\nOPERACIÓN SUJETA AL SISTEMA DE PAGO DE OBLIGACIONES TRIBUTARIAS CON EL GOBIERNO CENTRAL Bancode la Nacion CTA DE TRACCIONES:00741755262\r\nSERVICIO MANO DE OBRA NO INCLUYE IGV").FontSize(9);
-
+                        col.Item().AlignCenter()
+                            .Text("\n\nOPERACIÓN SUJETA AL SISTEMA DE PAGO DE OBLIGACIONES TRIBUTARIAS CON EL GOBIERNO CENTRAL Banco de la Nación CTA DE TRACCIONES: 00741755262\nSERVICIO MANO DE OBRA NO INCLUYE IGV")
+                            .FontSize(7.5f);
                     });
 
                     // FOOTER
@@ -523,11 +518,7 @@ namespace SistemaDeCotizacion.Controllers
                 });
             });
 
-            // ----------------------------
-            // Generar PDF y devolver inline (visor)
-            // ----------------------------
             var pdfBytes = document.GeneratePdf();
-
             Response.Headers["Content-Disposition"] = "inline; filename=cotizacion.pdf";
             return new FileContentResult(pdfBytes, "application/pdf");
         }
