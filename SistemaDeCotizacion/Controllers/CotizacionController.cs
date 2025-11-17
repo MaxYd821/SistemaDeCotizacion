@@ -11,6 +11,7 @@ using System.Security.Claims;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Policy = "Activo")]
     public class CotizacionController : Controller
     {
         private readonly AppDBContext _appDBContext;

@@ -8,6 +8,7 @@ namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
     [Authorize(Roles = "Administrador")]
+    [Authorize(Policy = "Activo")]
     public class RolController : Controller
     {
         private readonly AppDBContext _appDBContext;

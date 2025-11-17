@@ -10,6 +10,7 @@ using System.Security.Claims;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Policy = "Activo")]
     public class ClienteController : Controller
     {
         private readonly AppDBContext _appDBContext;

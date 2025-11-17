@@ -9,6 +9,7 @@ using SistemaDeCotizacion.Models;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Policy = "Activo")]
     public class ServicioController : Controller
     {
         private readonly AppDBContext _appDBContext;

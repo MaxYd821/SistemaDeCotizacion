@@ -8,6 +8,7 @@ using SistemaDeCotizacion.Models;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Policy = "Activo")]
     public class RepuestoController : Controller
     {
         private readonly AppDBContext _appDBContext;

@@ -22,6 +22,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Cuenta/Login";
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Activo", policy =>
+    {
+        policy.RequireClaim("estado", "Activo");
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

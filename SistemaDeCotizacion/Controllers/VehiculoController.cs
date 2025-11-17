@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace SistemaDeCotizacion.Controllers
 {
     [Authorize]
+    [Authorize(Policy = "Activo")]
     public class VehiculoController : Controller
     {
         private readonly AppDBContext _appDBContext;

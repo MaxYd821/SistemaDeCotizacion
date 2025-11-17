@@ -46,7 +46,8 @@ namespace SistemaDeCotizacion.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.usuario_id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.nombre + " " + usuario.apellido),
                 new Claim(ClaimTypes.Email, usuario.correo),
-                new Claim(ClaimTypes.Role, usuario.rol.rol_nombre)
+                new Claim(ClaimTypes.Role, usuario.rol.rol_nombre),
+                new Claim("estado", usuario.estado)
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

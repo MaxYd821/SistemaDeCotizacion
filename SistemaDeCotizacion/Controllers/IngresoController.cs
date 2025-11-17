@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaDeCotizacion.Data;
@@ -9,6 +10,7 @@ using System.Security.Claims;
 
 namespace SistemaDeCotizacion.Controllers
 {
+    [Authorize(Policy = "Activo")]
     public class IngresoController : Controller
     {
         private readonly AppDBContext _appDBContext;
