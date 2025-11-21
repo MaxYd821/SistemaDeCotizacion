@@ -98,6 +98,11 @@ namespace SistemaDeCotizacion.Controllers
         [HttpGet]
         public JsonResult ObtenerVehiculosPorCliente(int clienteId)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { error = "Solicitud inválida." });
+            }
+
             var vehiculos = _appDBContext.Vehiculos
                 .Where(v => v.cliente_id == clienteId)
                 .Select(v => new
@@ -121,12 +126,12 @@ namespace SistemaDeCotizacion.Controllers
                 if (model.ClienteId == null || model.VehiculoId == null)
                 {
                     ViewData["mensaje"] = "Debe seleccionar un cliente y un vehículo.";
-                    model.Clientes = _appDBContext.Clientes.ToList();
-                    model.Vehiculos = _appDBContext.Vehiculos
+                    model.Clientes = await _appDBContext.Clientes.ToListAsync();
+                    model.Vehiculos = await _appDBContext.Vehiculos
                                 .Where(v => v.cliente_id == model.ClienteId)
-                                .ToList();
-                    model.Servicios = _appDBContext.Servicios.ToList();
-                    model.Repuestos = _appDBContext.Repuestos.ToList();
+                                .ToListAsync();
+                    model.Servicios = await _appDBContext.Servicios.ToListAsync();
+                    model.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                     return View(model);
                 }
 
@@ -170,12 +175,12 @@ namespace SistemaDeCotizacion.Controllers
                     if (repuesto.stock < repSel.Cantidad)
                     {
                         ViewData["mensaje"] = $"El repuesto '{repuesto.descripcion}' no tiene suficiente stock. Disponible: {repuesto.stock}";
-                        model.Clientes = _appDBContext.Clientes.ToList();
-                        model.Vehiculos = _appDBContext.Vehiculos
+                        model.Clientes = await _appDBContext.Clientes.ToListAsync();
+                        model.Vehiculos = await _appDBContext.Vehiculos
                             .Where(v => v.cliente_id == model.ClienteId)
-                            .ToList();
-                        model.Servicios = _appDBContext.Servicios.ToList();
-                        model.Repuestos = _appDBContext.Repuestos.ToList();
+                            .ToListAsync();
+                        model.Servicios = await _appDBContext.Servicios.ToListAsync();
+                        model.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                         return View(model);
                     }
 
@@ -205,12 +210,12 @@ namespace SistemaDeCotizacion.Controllers
             catch (Exception ex)
             {
                 ViewData["mensaje"] = "Error al registrar la cotización: " + ex.Message;
-                model.Clientes = _appDBContext.Clientes.ToList();
-                model.Vehiculos = _appDBContext.Vehiculos
+                model.Clientes = await _appDBContext.Clientes.ToListAsync();
+                model.Vehiculos = await _appDBContext.Vehiculos
                             .Where(v => v.cliente_id == model.ClienteId)
-                            .ToList();
-                model.Servicios = _appDBContext.Servicios.ToList();
-                model.Repuestos = _appDBContext.Repuestos.ToList();
+                            .ToListAsync();
+                model.Servicios = await _appDBContext.Servicios.ToListAsync();
+                model.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                 return View(model);
             }
         }

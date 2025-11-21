@@ -76,10 +76,9 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Nuevo(Servicio servicio)
         {
-
             if (await _appDBContext.Servicios.AnyAsync(v => v.nombre_servicio == servicio.nombre_servicio))
             {
-                ViewBag.Servicios = _appDBContext.Servicios.ToList();
+                ViewBag.Servicios = await _appDBContext.Servicios.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un servicio con este nombre.";
                 return View(servicio);
             }
@@ -106,7 +105,6 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Servicio servicio)
         {
-
             var ser = await _appDBContext.Servicios.FindAsync(servicio.servicio_id);
             if (ser == null)
                 return NotFound();
@@ -115,7 +113,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(s => s.nombre_servicio == servicio.nombre_servicio && s.servicio_id != servicio.servicio_id);
             if (nombreRepetido)
             {
-                ViewBag.Servicios = _appDBContext.Servicios.ToList();
+                ViewBag.Servicios = await _appDBContext.Servicios.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un servicio con este nombre.";
                 return View(servicio);
             }

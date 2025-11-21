@@ -64,7 +64,8 @@
 
                         <div class="col-md-4">
                             <label asp-for="precio_und" class="form-label fw-semibold">Precio por unidad (S/.)</label>
-                            <input asp-for="precio_und" class="form-control" type="number" placeholder="Precio del repuesto" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                            <input asp-for="precio_und" class="form-control" value="@Model.precio_und.ToString("0.00")"
+                                   step="0.01" placeholder="Precio del repuesto" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');" />
                             <span asp-validation-for="precio_und" class="text-danger"></span>
                         </div>
 

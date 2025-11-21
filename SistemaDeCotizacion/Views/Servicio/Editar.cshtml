@@ -33,7 +33,8 @@
 
                             <div class="col-md-6">
                                 <label asp-for="precio" class="form-label">Precio del Servicio (S/.)</label>
-                                <input asp-for="precio" class="form-control" type="number" placeholder="Precio del Servicio (S/.)" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                                <input asp-for="precio" class="form-control" value="@Model.precio.ToString("0.00")"
+                                       step="0.01" placeholder="Precio del Servicio (S/.)" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');" />
                                 <span asp-validation-for="precio" class="text-danger"></span>
                             </div>
                         </div>

@@ -78,17 +78,16 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Nuevo(Repuesto repuesto)
         {
-
             if (await _appDBContext.Repuestos.AnyAsync(r => r.codigo_rep == repuesto.codigo_rep))
             {
-                ViewBag.Repuestos = _appDBContext.Repuestos.ToList();
+                ViewBag.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un repuesto con este código.";
                 return View(repuesto);
             }
 
             if (await _appDBContext.Repuestos.AnyAsync(r => r.descripcion == repuesto.descripcion))
             {
-                ViewBag.Repuestos = _appDBContext.Repuestos.ToList();
+                ViewBag.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un repuesto con esta descripción.";
                 return View(repuesto);
             }
@@ -115,7 +114,6 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Repuesto repuesto, string accionStock, int? valorStock)
         {
-
             var rep = await _appDBContext.Repuestos.FindAsync(repuesto.repuesto_id);
             if (rep == null)
                 return NotFound();
@@ -124,7 +122,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(r => r.codigo_rep == repuesto.codigo_rep && r.repuesto_id != repuesto.repuesto_id);
             if (codigoRepetido)
             {
-                ViewBag.Repuestos = _appDBContext.Repuestos.ToList();
+                ViewBag.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un repuesto con este código.";
                 return View(repuesto);
             }
@@ -133,7 +131,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(r => r.descripcion == repuesto.descripcion && r.repuesto_id != repuesto.repuesto_id);
             if (descripcionRepetida)
             {
-                ViewBag.Repuestos = _appDBContext.Repuestos.ToList();
+                ViewBag.Repuestos = await _appDBContext.Repuestos.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un repuesto con esta descripción.";
                 return View(repuesto);
             }

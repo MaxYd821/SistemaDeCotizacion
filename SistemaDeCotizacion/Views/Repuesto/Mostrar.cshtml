@@ -74,7 +74,7 @@
                                     <td>@item.descripcion</td>
                                     <td>@item.stock</td>
                                     <td>@item.medida_rep</td>
-                                    <td>@item.precio_und</td>
+                                    <td>@item.precio_und.ToString("F2")</td>
                                     <td>@item.fecha_registro_repuesto.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
                                         <a asp-controller="Repuesto" asp-action="Editar" asp-route-id="@item.repuesto_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>

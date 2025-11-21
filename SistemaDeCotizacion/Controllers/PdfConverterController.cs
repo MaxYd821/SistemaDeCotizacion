@@ -33,39 +33,78 @@ namespace SistemaDeCotizacion.Controllers
         private static string NumeroALetras(long value)
         {
             if (value == 0) return "cero";
-
-            string[] unidades = { "", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
-                          "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve" };
-            string[] decenas = { "", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa" };
-            string[] centenas = { "", "cien", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos",
-                          "setecientos", "ochocientos", "novecientos" };
-
-            if (value < 20) return unidades[value];
-            if (value < 100)
-                return decenas[value / 10] + ((value % 10 > 0) ? " y " + unidades[value % 10] : "");
-            if (value < 1000)
-                return (value == 100 ? "cien" : centenas[value / 100] + ((value % 100 > 0) ? " " + NumeroALetras(value % 100) : ""));
-            if (value < 1000000)
-            {
-                long miles = value / 1000;
-                long resto = value % 1000;
-                string milesTexto = (miles == 1) ? "mil" : NumeroALetras(miles) + " mil";
-                return milesTexto + ((resto > 0) ? " " + NumeroALetras(resto) : "");
-            }
-            if (value < 1000000000000)
-            {
-                long millones = value / 1000000;
-                long resto = value % 1000000;
-                string millonesTexto = (millones == 1) ? "un millón" : NumeroALetras(millones) + " millones";
-                return millonesTexto + ((resto > 0) ? " " + NumeroALetras(resto) : "");
-            }
+            if (value < 20) return ConvertirUnidad(value);
+            if (value < 100) return ConvertirDecena(value);
+            if (value < 1000) return ConvertirCentena(value);
+            if (value < 1_000_000) return ConvertirMiles(value);
+            if (value < 1_000_000_000_000) return ConvertirMillones(value);
 
             return "";
         }
 
+        private static string ConvertirUnidad(long value)
+        {
+            string[] unidades = {
+        "", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
+        "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve"
+    };
+
+            return unidades[value];
+        }
+
+        private static string ConvertirDecena(long value)
+        {
+            string[] decenas = {
+        "", "", "veinte", "treinta", "cuarenta", "cincuenta",
+        "sesenta", "setenta", "ochenta", "noventa"
+    };
+
+            long unidad = value % 10;
+            return decenas[value / 10] + (unidad > 0 ? " y " + ConvertirUnidad(unidad) : "");
+        }
+
+        private static string ConvertirCentena(long value)
+        {
+            string[] centenas = {
+        "", "cien", "doscientos", "trescientos", "cuatrocientos",
+        "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"
+    };
+
+            if (value == 100) return "cien";
+
+            long resto = value % 100;
+            return centenas[value / 100] + (resto > 0 ? " " + NumeroALetras(resto) : "");
+        }
+
+        private static string ConvertirMiles(long value)
+        {
+            long miles = value / 1000;
+            long resto = value % 1000;
+
+            string milesTexto = miles == 1 ? "mil" : NumeroALetras(miles) + " mil";
+
+            return milesTexto + (resto > 0 ? " " + NumeroALetras(resto) : "");
+        }
+
+        private static string ConvertirMillones(long value)
+        {
+            long millones = value / 1_000_000;
+            long resto = value % 1_000_000;
+
+            string millonesTexto = millones == 1 ? "un millón" : NumeroALetras(millones) + " millones";
+
+            return millonesTexto + (resto > 0 ? " " + NumeroALetras(resto) : "");
+        }
+
+
         [HttpGet]
         public IActionResult GenerarPDFCotizacion(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(id);
+            }
+
             var cotizacion = _appDBContext.Cotizaciones
                 .Include(c => c.cliente)
                     .ThenInclude(c => c.vehiculos)

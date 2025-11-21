@@ -81,14 +81,14 @@ namespace SistemaDeCotizacion.Controllers
         {
             if (await _appDBContext.Clientes.AnyAsync(c => c.correo_cliente == cliente.correo_cliente))
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Correo ya registrado.";
                 return View(cliente);
             }
 
             if (await _appDBContext.Clientes.AnyAsync(c => c.ruc == cliente.ruc))
             {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                 ViewData["mensaje"] = "RUC/DNI ya registrado.";
                 return View(cliente);
             }
@@ -97,7 +97,7 @@ namespace SistemaDeCotizacion.Controllers
             {
                 if (cliente.ruc.Length != 8)
                 {
-                    ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                    ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                     ViewData["mensaje"] = "La longitud del DNI debe ser de 8 dígitos.";
                     return View(cliente);
                 }
@@ -106,7 +106,7 @@ namespace SistemaDeCotizacion.Controllers
             {
                 if (cliente.ruc.Length != 11)
                 {
-                    ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                    ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                     ViewData["mensaje"] = "La longitud del RUC debe ser de 11 dígitos.";
                     return View(cliente);
                 }
@@ -147,7 +147,7 @@ namespace SistemaDeCotizacion.Controllers
                 direccion_cliente = cliente.direccion_cliente,
             };
 
-            ViewBag.Clientes = _appDBContext.Clientes.ToList();
+            ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
             return View(cliente_edi);
         }
         [HttpPost]
@@ -155,7 +155,7 @@ namespace SistemaDeCotizacion.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                 ViewData["mensaje"] = "Revisa los datos ingresados.";
                 return View(cliente);
             }
@@ -168,7 +168,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(c => c.correo_cliente == cliente.correo_cliente && c.cliente_id != cliente.cliente_id);
             if (correoRepetido)
             {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un cliente con ese correo.";
                 return View(cliente);
             }
@@ -177,7 +177,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(c => c.ruc == cliente.ruc && c.cliente_id != cliente.cliente_id);
             if (dniRepetido)
             {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync() ;
                 ViewData["mensaje"] = "Ya existe un cliente con ese RUC/DNI.";
                 return View(cliente);
             }
@@ -186,7 +186,7 @@ namespace SistemaDeCotizacion.Controllers
             {
                 if (cliente.ruc.Length != 8)
                 {
-                    ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                    ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                     ViewData["mensaje"] = "La longitud del DNI debe ser de 8 dígitos.";
                     return View(cliente);
                 }
@@ -195,7 +195,7 @@ namespace SistemaDeCotizacion.Controllers
             {
                 if (cliente.ruc.Length != 11)
                 {
-                    ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                    ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                     ViewData["mensaje"] = "La longitud del RUC debe ser de 11 dígitos.";
                     return View(cliente);
                 }

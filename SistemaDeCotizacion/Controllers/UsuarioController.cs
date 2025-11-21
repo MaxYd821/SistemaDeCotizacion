@@ -78,7 +78,7 @@ namespace SistemaDeCotizacion.Controllers
         [HttpGet]
         public async Task<IActionResult> Nuevo()
         {
-            ViewBag.Roles = _appDBContext.Roles.ToList();
+            ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
             return View();
         }
 
@@ -87,14 +87,14 @@ namespace SistemaDeCotizacion.Controllers
         {
             if (await _appDBContext.Usuarios.AnyAsync(u => u.correo == model.correo))
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Correo ya registrado.";
                 return View(model);
             }
 
             if (await _appDBContext.Usuarios.AnyAsync(u => u.dni == model.dni))
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "DNI ya registrado.";
                 return View(model);
             }
@@ -103,13 +103,13 @@ namespace SistemaDeCotizacion.Controllers
             if (model.fecha_nacimiento > DateTime.Today.AddYears(-edad)) edad--;
             if (edad < 18)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Debes tener al menos 18 años.";
                 return View(model);
             }
             if (model.password!=model.confirmarpassword)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Las contraseñas no coinciden";
                 return View(model);
             }
@@ -156,7 +156,7 @@ namespace SistemaDeCotizacion.Controllers
                 rol_id = usuario.rol_id
             };
 
-            ViewBag.Roles = _appDBContext.Roles.ToList();
+            ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
             return View(model);
         }
 
@@ -165,7 +165,7 @@ namespace SistemaDeCotizacion.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Revisa los datos ingresados.";
                 return View(model);
             }
@@ -178,7 +178,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(u => u.correo == model.correo && u.usuario_id != model.usuario_id);
             if (correoRepetido)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un usuario con ese correo.";
                 return View(model);
             }
@@ -187,7 +187,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(u => u.dni == model.dni && u.usuario_id != model.usuario_id);
             if (dniRepetido)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un usuario con ese DNI.";
                 return View(model);
             }
@@ -196,7 +196,7 @@ namespace SistemaDeCotizacion.Controllers
             if (model.fecha_nacimiento > DateTime.Today.AddYears(-edad)) edad--;
             if (edad < 18)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "El usuario debe tener al menos 18 años.";
                 return View(model);
             }

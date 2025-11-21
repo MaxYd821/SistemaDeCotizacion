@@ -75,10 +75,30 @@ namespace SistemaDeCotizacion.Controllers
         }
 
         [HttpGet]
-        public IActionResult Nuevo()
+        public async Task<IActionResult> Nuevo()
         {
-            ViewBag.Clientes = _appDBContext.Clientes.ToList();
+            ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Nuevo(Vehiculo vehiculo)
+        {
+            if (await _appDBContext.Vehiculos.AnyAsync(v => v.placa == vehiculo.placa))
+            {
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
+                ViewData["mensaje"] = "Ya existe un vehículo con esa placa.";
+                return View(vehiculo);
+            }
+
+            vehiculo.fecha_registro_vehiculo = DateTime.Now;
+
+            await _appDBContext.Vehiculos.AddAsync(vehiculo);
+            await _appDBContext.SaveChangesAsync();
+            TempData["mensaje"] = "Vehículo creado exitosamente.";
+
+
+            return RedirectToAction(nameof(Mostrar));
         }
 
         [HttpGet]
@@ -100,27 +120,6 @@ namespace SistemaDeCotizacion.Controllers
             return Json(clientes);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Nuevo(Vehiculo vehiculo)
-        {
-
-            if (await _appDBContext.Vehiculos.AnyAsync(v => v.placa == vehiculo.placa))
-            {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
-                ViewData["mensaje"] = "Ya existe un vehículo con esa placa.";
-                return View(vehiculo);
-            }
-
-            vehiculo.fecha_registro_vehiculo = DateTime.Now;
-
-            await _appDBContext.Vehiculos.AddAsync(vehiculo);
-            await _appDBContext.SaveChangesAsync();
-            TempData["mensaje"] = "Vehículo creado exitosamente.";
-
-
-            return RedirectToAction(nameof(Mostrar));
-        }
-
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
@@ -131,14 +130,13 @@ namespace SistemaDeCotizacion.Controllers
             if (vehiculo == null)
                 return NotFound();
 
-            ViewBag.Clientes = _appDBContext.Clientes.ToList();
+            ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
             return View(vehiculo);
         }
 
         [HttpPost]
         public async Task<IActionResult> Editar(Vehiculo vehiculo)
         {
-
             var veh = await _appDBContext.Vehiculos.FindAsync(vehiculo.vehiculo_id);
             if (veh == null)
                 return NotFound();
@@ -147,7 +145,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(v => v.placa == vehiculo.placa && v.vehiculo_id != vehiculo.vehiculo_id);
             if (placaRepetida)
             {
-                ViewBag.Clientes = _appDBContext.Clientes.ToList();
+                ViewBag.Clientes = await _appDBContext.Clientes.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un vehículo con esa placa.";
                 return View(vehiculo);
             }

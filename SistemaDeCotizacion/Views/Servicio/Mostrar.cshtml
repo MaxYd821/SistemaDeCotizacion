@@ -68,7 +68,7 @@
                             {
                                 <tr>
                                     <td>@item.nombre_servicio</td>
-                                    <td>@item.precio</td>
+                                    <td>@item.precio.ToString("F2")</td>
                                     <td>@item.fecha_registro_servicio.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
                                         <a asp-controller="Servicio" asp-action="Editar" asp-route-id="@item.servicio_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>

@@ -43,10 +43,9 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Nuevo(Rol rol)
         {
-
             if (await _appDBContext.Roles.AnyAsync(r => r.rol_nombre == rol.rol_nombre))
             {
-                ViewBag.Roles = _appDBContext.Servicios.ToList();
+                ViewBag.Roles = await _appDBContext.Servicios.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un rol con este nombre.";
                 return View(rol);
             }
@@ -71,7 +70,6 @@ namespace SistemaDeCotizacion.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Rol rol)
         {
-
             var ro = await _appDBContext.Roles.FindAsync(rol.rol_id);
             if (ro == null)
                 return NotFound();
@@ -80,7 +78,7 @@ namespace SistemaDeCotizacion.Controllers
                 .AnyAsync(r => r.rol_nombre == rol.rol_nombre && r.rol_id != rol.rol_id);
             if (nombreRepetido)
             {
-                ViewBag.Roles = _appDBContext.Roles.ToList();
+                ViewBag.Roles = await _appDBContext.Roles.ToListAsync();
                 ViewData["mensaje"] = "Ya existe un rol con este nombre.";
                 return View(rol);
             }
