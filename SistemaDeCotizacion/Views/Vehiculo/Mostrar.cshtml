@@ -70,8 +70,8 @@
                                     <td>@item.kilometraje</td>
                                     <td>@item.cliente.nombre_cliente</td>
                                     <td class="text-center">
-                                        <a asp-controller="Vehiculo" asp-action="Editar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
-                                        <a asp-controller="Vehiculo" asp-action="Eliminar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                        <a asp-controller="Vehiculo" asp-action="Editar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-outline-dark me-2">🖊️</a>
+                                        <a asp-controller="Vehiculo" asp-action="Eliminar" asp-route-id="@item.vehiculo_id" class="btn btn-sm btn-danger me-2 text-white">🗑️</a>
                                     </td>
                                 </tr>
                             }

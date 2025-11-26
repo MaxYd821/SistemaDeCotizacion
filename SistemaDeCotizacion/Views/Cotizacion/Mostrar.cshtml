@@ -89,8 +89,8 @@
                                     <td>@($"{item.costo_repuesto_total:0.00}")</td>
                                     <td>@($"{item.costo_repuesto_total + item.costo_servicio_total:0.00}")</td>
                                     <td class="text-center">
-                                        <a asp-controller="Cotizacion" asp-action="Editar" asp-route-id="@item.cotizacion_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
-                                        <a asp-controller="Cotizacion" asp-action="Eliminar" asp-route-id="@item.cotizacion_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                        <a asp-controller="Cotizacion" asp-action="Editar" asp-route-id="@item.cotizacion_id" class="btn btn-sm btn-outline-dark me-2">🖊️</a>
+                                        <a asp-controller="Cotizacion" asp-action="Eliminar" asp-route-id="@item.cotizacion_id" class="btn btn-sm btn-danger me-2 text-white">🗑️</a>
                                     </td>
                                     <td class="text-center">
                                         <a class="btn btn-primary"

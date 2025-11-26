@@ -88,8 +88,8 @@
                                     <td>@item.fecha_registro.ToString("dd-MM-yyyy")</td>
                                     <td>@item.fecha_nacimiento.ToString("dd-MM-yyyy")</td>
                                     <td class="text-center">
-                                        <a asp-controller="Usuario" asp-action="Editar" asp-route-id="@item.usuario_id" class="btn btn-sm btn-outline-dark me-2">Editar</a>
-                                        <a asp-controller="Usuario" asp-action="Eliminar" asp-route-id="@item.usuario_id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                        <a asp-controller="Usuario" asp-action="Editar" asp-route-id="@item.usuario_id" class="btn btn-sm btn-outline-dark me-2">🖊️</a>
+                                        <a asp-controller="Usuario" asp-action="Eliminar" asp-route-id="@item.usuario_id" class="btn btn-sm btn-danger me-2 text-white">🗑️</a>
                                     </td>
                                 </tr>
                             }
