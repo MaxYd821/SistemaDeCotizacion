@@ -85,9 +85,9 @@ namespace Test_SDC
         }
 
         [TestMethod]
-        public void Nuevo_Get_MuestraVista()
+        public async Task Nuevo_Get_MuestraVista()
         {
-            var result = _controller.Nuevo();
+            var result = await _controller.Nuevo();
             Assert.IsInstanceOfType(result, typeof(ViewResult));
         }
 
