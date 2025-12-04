@@ -1,4 +1,4 @@
-﻿﻿@using System.Security.Claims
+﻿@using System.Security.Claims
 @functions {
     string CurrentController =>
         ViewContext.RouteData.Values["controller"]?.ToString();
@@ -66,13 +66,35 @@
             color: #ffffff !important;
         }
 
+        /* Ajuste para que el toggle sea claramente visible y con tamaño cómodo en móvil */
+        #menuToggle {
+            min-width: 44px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
     </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light border-bottom shadow-sm px-4 py-2" id="mainNavbar">
             <div class="container-fluid">
+                <!-- Botón para mostrar/ocultar menú en móviles (parte superior izquierda) -->
+                <button id="menuToggle"
+                        class="btn btn-outline-secondary d-lg-none me-2"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav"
+                        aria-controls="navbarNav"
+                        aria-expanded="false"
+                        aria-label="Mostrar u ocultar menú">
+                    <i class="bi bi-list" aria-hidden="true" style="font-size: 1.25rem;"></i>
+                </button>
+
                 <a class="navbar-brand fw-bold text-dark" asp-controller="Cliente" asp-action="Mostrar">TodoCamiones</a>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @if (rolUsuario == "Administrador")
@@ -216,14 +238,16 @@
         // Inicializar tema
         const currentTheme = localStorage.getItem("theme") || "light";
         htmlEl.setAttribute("data-bs-theme", currentTheme);
-        switchInput.checked = currentTheme === "dark";
+        if (switchInput) {
+            switchInput.checked = currentTheme === "dark";
 
-        // Toggle del switch
-        switchInput.addEventListener("change", () => {
-            const newTheme = switchInput.checked ? "dark" : "light";
-            htmlEl.setAttribute("data-bs-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-        });
+            // Toggle del switch
+            switchInput.addEventListener("change", () => {
+                const newTheme = switchInput.checked ? "dark" : "light";
+                htmlEl.setAttribute("data-bs-theme", newTheme);
+                localStorage.setItem("theme", newTheme);
+            });
+        }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
