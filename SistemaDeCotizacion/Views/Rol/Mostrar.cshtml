@@ -23,13 +23,19 @@
         <div class="col-lg-10">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold text-primary">Gestión de Roles</h3>
-                <a asp-controller="Rol" asp-action="Nuevo" class="btn btn-dark">Registrar Nuevo Rol</a>
+                <ul class="nav-item">
+                    <a class="nav-link d-flex flex-column align-items-center"
+                       asp-controller="Rol" asp-action="Nuevo">
+                        <i class="bi bi-plus-square" style="font-size: 3rem;"></i>
+                        <span>Nuevo</span>
+                    </a>
+                </ul>
             </div>
 
             <form asp-action="Mostrar" method="get" class="mb-4">
                 <div class="input-group">
                     <input type="text" name="busqueda" value="@(Context.Request.Query["busqueda"])" class="form-control" placeholder="Buscar por nombre..." />
-                    <button type="submit" class="btn btn-dark">Buscar</button>
+                    <button type="submit" class="btn btn-dark"><i class="bi bi-search"></i> Buscar</button>
                 </div>
             </form>
 

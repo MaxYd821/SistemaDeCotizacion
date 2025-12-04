@@ -1,4 +1,19 @@
 ﻿﻿@using System.Security.Claims
+@functions {
+    string CurrentController =>
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    string CurrentAction =>
+        ViewContext.RouteData.Values["action"]?.ToString();
+
+    string Active(string controller, string action = "Mostrar")
+    {
+        return (controller == CurrentController && action == CurrentAction)
+            ? "active text-primary fw-bold"
+            : "";
+    }
+}
+
 @{
     var rolUsuario = User.FindFirstValue(ClaimTypes.Role);
 }
@@ -63,56 +78,56 @@
                         @if (rolUsuario == "Administrador")
                         {
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Usuario", "Mostrar")"
                                    asp-controller="Usuario" asp-action="Mostrar">
                                     <i class="bi bi-people" style="font-size: 1.5rem;"></i>
                                     <span>Usuarios</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Rol", "Mostrar")"
                                    asp-controller="Rol" asp-action="Mostrar">
                                     <i class="bi bi-person-fill-gear" style="font-size: 1.5rem;"></i>
                                     <span>Roles</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Cliente", "Mostrar")"
                                    asp-controller="Cliente" asp-action="Mostrar">
                                     <i class="bi bi-person-vcard" style="font-size: 1.5rem;"></i>
                                     <span>Clientes</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Vehiculo", "Mostrar")"
                                    asp-controller="Vehiculo" asp-action="Mostrar">
                                     <i class="bi bi-car-front" style="font-size: 1.5rem;"></i>
                                     <span>Vehículos</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Servicio", "Mostrar")"
                                    asp-controller="Servicio" asp-action="Mostrar">
                                     <i class="bi bi-tools" style="font-size: 1.5rem;"></i>
                                     <span>Servicios</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Repuesto", "Mostrar")"
                                    asp-controller="Repuesto" asp-action="Mostrar">
                                     <i class="bi bi-box-seam-fill" style="font-size: 1.5rem;"></i>
                                     <span>Repuestos</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Cotizacion", "Mostrar")"
                                    asp-controller="Cotizacion" asp-action="Mostrar">
                                     <i class="bi bi-file-earmark-bar-graph-fill" style="font-size: 1.5rem;"></i>
                                     <span>Cotizaciones</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Ingreso", "Mostrar")"
                                    asp-controller="Ingreso" asp-action="Mostrar">
                                     <i class="bi bi-currency-dollar" style="font-size: 1.5rem;"></i>
                                     <span>Ingresos</span>
@@ -122,49 +137,42 @@
                         @if (rolUsuario == "Encargado de Logística")
                         {
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
-                                   asp-controller="Usuario" asp-action="Mostrar">
-                                    <i class="bi bi-people" style="font-size: 1.5rem;"></i>
-                                    <span>Usuarios</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Cliente", "Mostrar")"
                                    asp-controller="Cliente" asp-action="Mostrar">
                                     <i class="bi bi-person-vcard" style="font-size: 1.5rem;"></i>
                                     <span>Clientes</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Vehiculo", "Mostrar")"
                                    asp-controller="Vehiculo" asp-action="Mostrar">
                                     <i class="bi bi-car-front" style="font-size: 1.5rem;"></i>
                                     <span>Vehículos</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Servicio", "Mostrar")"
                                    asp-controller="Servicio" asp-action="Mostrar">
                                     <i class="bi bi-tools" style="font-size: 1.5rem;"></i>
                                     <span>Servicios</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Repuesto", "Mostrar")"
                                    asp-controller="Repuesto" asp-action="Mostrar">
                                     <i class="bi bi-box-seam-fill" style="font-size: 1.5rem;"></i>
                                     <span>Repuestos</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Cotizacion", "Mostrar")"
                                    asp-controller="Cotizacion" asp-action="Mostrar">
                                     <i class="bi bi-file-earmark-bar-graph-fill" style="font-size: 1.5rem;"></i>
                                     <span>Cotizaciones</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex flex-column align-items-center"
+                                <a class="nav-link d-flex flex-column align-items-center @Active("Ingreso", "Mostrar")"
                                    asp-controller="Ingreso" asp-action="Mostrar">
                                     <i class="bi bi-currency-dollar" style="font-size: 1.5rem;"></i>
                                     <span>Ingresos</span>

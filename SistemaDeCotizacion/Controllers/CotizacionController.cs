@@ -139,11 +139,12 @@ namespace SistemaDeCotizacion.Controllers
 
                 double totalServicios = 0;
                 double totalRepuestos = 0;
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
 
                 var cotizacion = new Cotizacion
                 {
-                    cliente_id = model.ClienteId,
-                    fecha_cotizacion = DateTime.Now,
+                    cliente_id = model.ClienteId,                    
+                    fecha_cotizacion = TimeZoneInfo.ConvertTime(DateTime.Now, tz),
                     formaPago = model.formaPago ?? string.Empty,
                     tiempoEntrega = model.tiempoEntrega,
                     estado_cotizacion = model.estado_cotizacion ?? "Pendiente",

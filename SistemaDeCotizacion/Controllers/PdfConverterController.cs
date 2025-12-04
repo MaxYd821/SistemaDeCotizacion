@@ -187,7 +187,6 @@ namespace SistemaDeCotizacion.Controllers
 
             var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "Logo.png");
             var logoExists = System.IO.File.Exists(logoPath);
-
             var document = Document.Create(container =>
             {
                 container.Page(page =>

@@ -11,7 +11,7 @@ namespace SistemaDeCotizacion.Models
         public string estado_cotizacion { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}")]
         public DateTime fecha_cotizacion { get; set; }
         public int tiempoEntrega { get; set; }
         public string trabajador { get; set; }
